@@ -9,11 +9,14 @@
 % Representacion:
 %  pixhex-d <- x (int) X y (int) X hex(String) X depth
 /*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION PIXHEX ------------------------------------------------------*/
+% Dominio: 3 numeros de tipo entero y un elemento de tipo string
+% Recorrido: una lista que contiene los tres numeros del dominio y el string
+% Descripcion: Funcion constructora del TDA pixhex, que guarda las posiciones, el hex y la profundidad
 
+pixhex(X, Y, Hex, Profundidad, [X, Y, Hex, Profundidad]):-
+    integer(X), integer(Y), string(Hex), integer(Profundidad),
+    X >= 0, Y >= 0,  Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/

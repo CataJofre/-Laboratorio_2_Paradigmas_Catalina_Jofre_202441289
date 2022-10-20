@@ -11,11 +11,14 @@
 % pixrgb-d <- x (int) X y (int) X red X green  X blue X depth
 
 /*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION PIXRGB------------------------------------------------------*/
+% Dominio: 6 numeros de tipo entero
+% Recorrido: una lista que contiene los seis numeros del dominio
+% Descripcion: Funcion constructora del TDA pixbit, que guarda las posiciones, los colores R,G y B, y la profundidad
 
+pixrgb(X, Y, R,G,B, Profundidad, [X, Y, R,G,B, Profundidad]):-
+     integer(X), integer(Y), integer(R), integer(G), integer(B), integer(Profundidad),
+     X >= 0, Y >= 0, R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255,Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/

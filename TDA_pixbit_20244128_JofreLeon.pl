@@ -9,11 +9,14 @@
 % Representacion:
 % pixbit-d <- x (int) X y (int) X bit ([0|1]) X depth (int))
 /*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION PIXBIT------------------------------------------------------*/
+% Dominio: 4 numeros de tipo entero
+% Recorrido: una lista que contiene los cuatro numeros del dominio
+% Descripcion: Funcion constructora del TDA pixbit, que guarda las posiciones, el bit y la profundidad
 
+pixbit(X, Y, Bit, Profundidad, [X, Y, Bit, Profundidad]):-
+    integer(X), integer(Y), integer(Bit), integer(Profundidad),
+    X >= 0, Y >= 0, Bit>= 0, Bit =< 1, Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/

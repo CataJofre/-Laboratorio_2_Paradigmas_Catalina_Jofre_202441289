@@ -10,11 +10,14 @@
 
 % Es una lista que contiene el alto ancho y una lista con la cantidad correspondiente de pixeles
 /*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION IMAGE ------------------------------------------------------*/
+% Dominio: datos de tipo int y una lista
+% Recorrido:una lista con la informacion
+% Descripcion: Constructor del TDA image que toma un alto, ancho y una lista con pixeles
 
+image(Ancho, Alto, Lista_pixeles, [Ancho, Alto, Lista_pixeles] ):-
+    integer(Ancho), integer(Alto),
+    Ancho >= 1, Alto >= 1.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/

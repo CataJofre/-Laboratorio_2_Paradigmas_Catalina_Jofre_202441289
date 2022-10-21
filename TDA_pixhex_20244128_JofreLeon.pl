@@ -1,3 +1,4 @@
+:- module(tda_pixhex_20244128_JofreLeon,[pixhex/5]).
 /*-----------------------------------------------------TDA PIXHEX-------------------------------------------*/
 % Este archivo corresponde al TDA pixhex, se encuentran todas los predicados necesarios para su creacion, 
 % tambien los predicados organizados segun estructura.
@@ -19,11 +20,15 @@ pixhex(X, Y, Hex, Profundidad, [X, Y, Hex, Profundidad]):-
     X >= 0, Y >= 0,  Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION IMAGE-IS-HEXMAP------------------------------------------------------*/
+% Dominio: Imagen (lista con el ancho, alto y los pixeles)
+% Recorrido: Boolean
+% Descripcion: Si es una imagen del tipo hex xmap retorna true (muestra la imagen), sino retorna false
 
+imageIsHexmap([_,_, [[_,_, Hex,_]|_]]) :-
+   string(Hex)-> 
+    writeln('#t');
+    writeln('#f').
 /*-----------------------------------------------------SELECTORES------------------------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/
 % Dominio:

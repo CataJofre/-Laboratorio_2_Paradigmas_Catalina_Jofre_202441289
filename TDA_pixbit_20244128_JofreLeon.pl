@@ -1,3 +1,5 @@
+:- module(tda_pixbit_20244128_JofreLeon,[pixbit/5]).
+
 /*-----------------------------------------------------TDA PIXBIT-------------------------------------------*/
 % Este archivo corresponde al TDA pixbit, se encuentran todas los predicados necesarios para su creacion, 
 % tambien los predicados organizados segun estructura.
@@ -19,11 +21,15 @@ pixbit(X, Y, Bit, Profundidad, [X, Y, Bit, Profundidad]):-
     X >= 0, Y >= 0, Bit>= 0, Bit =< 1, Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION IMAGE-IS-BITMAP------------------------------------------------------*/
+% Dominio: Imagen (lista con el ancho, alto y los pixeles)
+% Recorrido: Boolean
+% Descripcion: Si es una imagen del tipo bitxmap retorna true (muestra la imagen), sino retorna false
 
+imageIsBitmap([_,_, [[_,_, Bit,_]|_]]) :-
+    Bit >= 0, Bit < 2-> 
+    writeln('#t');
+    writeln('#f').
 /*-----------------------------------------------------SELECTORES------------------------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/
 % Dominio:

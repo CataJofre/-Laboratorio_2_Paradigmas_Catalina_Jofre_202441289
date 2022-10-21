@@ -1,3 +1,4 @@
+:- module(tda_pixrgb_20244128_JofreLeon,[pixrgb/7]).
 /*-----------------------------------------------------TDA PIXRGB-------------------------------------------*/
 % Este archivo corresponde al TDA pixrgb, se encuentran todas los predicados necesarios para su creacion, 
 % tambien los predicados organizados segun estructura.
@@ -21,11 +22,15 @@ pixrgb(X, Y, R,G,B, Profundidad, [X, Y, R,G,B, Profundidad]):-
      X >= 0, Y >= 0, R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255,Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*--------------------------------------FUNCION IMAGE-IS-PIXMAP------------------------------------------------------*/
+% Dominio: Imagen (lista con el ancho, alto y los pixeles)
+% Recorrido: Boolean
+% Descripcion: Si es una imagen del tipo pixmap retorna true (muestra la imagen), sino retorna false
 
+imageIsPixmap([_,_, [[_,_,R,G,B,_]|_]]) :-
+    R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255 -> 
+    writeln('#t');
+    writeln('#f').
 /*-----------------------------------------------------SELECTORES------------------------------------------*/
 /*--------------------------------------FUNCION ------------------------------------------------------*/
 % Dominio:

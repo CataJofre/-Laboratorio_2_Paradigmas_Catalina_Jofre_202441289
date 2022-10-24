@@ -1,4 +1,4 @@
-:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6 ]).
+:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2 ]).
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
 :- use_module(tda_pixrgb_20244128_JofreLeon).
@@ -193,3 +193,16 @@ imageCrop(Image,X1,Y1, X2,Y2, Image2):-
     image(Ancho,Alto, ListaPixeles, Image),
     cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados),
     image(Ancho,Alto, PixelesSeleccionados, Image2).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+
+imageRGBToHex(Image, Image2):-
+    image(Ancho,Alto, ListaPixeles, Image),
+  	rgb_hex(ListaPixeles, PixelesAHex),
+    image(Ancho,Alto, PixelesAHex, Image2).
+    

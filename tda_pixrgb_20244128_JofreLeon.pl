@@ -1,4 +1,4 @@
-:- module(tda_pixrgb_20244128_JofreLeon,[pixrgb/7]).
+:- module(tda_pixrgb_20244128_JofreLeon,[pixrgb/7,imageIsPixmap/1]).
 /*-----------------------------------------------------TDA PIXRGB-------------------------------------------*/
 % Este archivo corresponde al TDA pixrgb, se encuentran todas los predicados necesarios para su creacion, 
 % tambien los predicados organizados segun estructura.
@@ -12,17 +12,17 @@
 % pixrgb-d <- x (int) X y (int) X red X green  X blue X depth
 
 /*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
-/*--------------------------------------FUNCION PIXRGB------------------------------------------------------*/
+/*-------------------------------------- PREDICADO PIXRGB------------------------------------------------------*/
 % Dominio: 6 numeros de tipo entero
 % Recorrido: una lista que contiene los seis numeros del dominio
-% Descripcion: Funcion constructora del TDA pixbit, que guarda las posiciones, los colores R,G y B, y la profundidad
+% Descripcion:  PREDICADO constructora del TDA pixbit, que guarda las posiciones, los colores R,G y B, y la profundidad
 
 pixrgb(X, Y, R,G,B, Profundidad, [X, Y, R,G,B, Profundidad]):-
      integer(X), integer(Y), integer(R), integer(G), integer(B), integer(Profundidad),
      X >= 0, Y >= 0, R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255,Profundidad >= 0.
 
 /*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
-/*--------------------------------------FUNCION IMAGE-IS-PIXMAP------------------------------------------------------*/
+/*-------------------------------------- PREDICADO IMAGE-IS-PIXMAP------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
 % Recorrido: Boolean
 % Descripcion: Si es una imagen del tipo pixmap retorna true (muestra la imagen), sino retorna false
@@ -32,19 +32,19 @@ imageIsPixmap([_,_, [[_,_,R,G,B,_]|_]]) :-
     writeln('#t');
     writeln('#f').
 /*-----------------------------------------------------SELECTORES------------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
+/*-------------------------------------- PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
 % Descripcion:
 
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
+/*-------------------------------------- PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
 % Descripcion:
 
 /*-----------------------------------------------------OTROS PREDICADOS------------------------------------*/
-/*--------------------------------------FUNCION ------------------------------------------------------*/
+/*-------------------------------------- PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
 % Descripcion:

@@ -1,4 +1,4 @@
-:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2 ]).
+:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2,imageCompress/2 ]).
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
 :- use_module(tda_pixrgb_20244128_JofreLeon).
@@ -44,6 +44,78 @@ seleccionar_pixeles([_|Cola],Inicio,Fin,ColaResultado) :-
 	Inicio > 1, 
     Inicio1 is Inicio - 1, Fin1 is Fin - 1, 
   seleccionar_pixeles(Cola,Inicio1,Fin1,ColaResultado).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+color_frecuente([], _, []).
+color_frecuente([[_,_, ColorPixel,_]|Cola], ColorFrecuente, Resultado):- 
+   ColorPixel\=ColorFrecuente->   
+    color_frecuente(Cola, ColorFrecuente, Resultado). 
+color_frecuente([[X, Y, ColorPixel, Profundidad]|Cola], ColorFrecuente, [[X, Y, ColorPixel, Profundidad]|Resultado]):- 
+    color_frecuente(Cola, ColorFrecuente, Resultado).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+resto_de_colores([], _, []).
+resto_de_colores([[_,_, ColorPixel,_]|Cola], ColorFrecuente, Resultado):- 
+   ColorPixel==ColorFrecuente->   
+   resto_de_colores(Cola, ColorFrecuente, Resultado). 
+resto_de_colores([[X, Y, ColorPixel, Profundidad]|Cola], ColorFrecuente, [[X, Y, ColorPixel, Profundidad]|Resultado]):- 
+    resto_de_colores(Cola, ColorFrecuente, Resultado).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+color_frecuente_rgb([], _, _,_,[]).
+color_frecuente_rgb([[_,_,R,G,B,_]|Cola], R_frecuente, G_frecuente, B_frecuente, Resultado):- 
+ R \=  R_frecuente, G \=  G_frecuente, B \=  B_frecuente  ->   
+    color_frecuente_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado). 
+color_frecuente_rgb([[X, Y, R,G,B, Profundidad]|Cola], R_frecuente, G_frecuente, B_frecuente, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
+    color_frecuente_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+resto_de_colores_rgb([], _,_,_, []).
+resto_de_colores_rgb([[_,_,R,G,B,_]|Cola], R_frecuente, G_frecuente, B_frecuente, Resultado):- 
+   R ==  R_frecuente, G ==  G_frecuente, B ==  B_frecuente  ->   
+   resto_de_colores_rgb(Cola,R_frecuente, G_frecuente, B_frecuente, Resultado). 
+resto_de_colores_rgb([[X, Y, R,G,B, Profundidad]|Cola], R_frecuente, G_frecuente, B_frecuente, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
+    resto_de_colores_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+colores(Lista, Color, ColorFrecuente,RestoDeColores):-
+    color_frecuente(Lista, Color, ColorFrecuente),
+	resto_de_colores(Lista, Color, RestoDeColores).
+
+colores_rgb(Lista, R,G,B, ColorFrecuente,RestoDeColores):-
+    color_frecuente_rgb(Lista, R,G,B, ColorFrecuente),
+	resto_de_colores_rgb(Lista, R,G,B, RestoDeColores).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+
+color_histograma( [[Color,_]|_], Color).
+color_histograma_rgb( [[[R,G,B],_]|_], R,G,B).
 
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
@@ -317,3 +389,23 @@ imageRotate90(Image, I):-
     rotate_Aux(Alto,PixelsIn, PixelsOut), 
    	ordenar_segun_x(PixelsOut,PixelsOutOrdenado),
     image(Ancho, Alto, PixelsOutOrdenado, I).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+
+imageCompress(Image, ImageComprimida):-
+    imageIsPixmap(Image)->  
+    	image(Alto,Ancho, ListaPixeles, Image),
+    	imageToHistogram(Image, Histograma),
+    	color_histograma_rgb( Histograma, R,G,B),
+    	colores_rgb(ListaPixeles,R,G,B, _,PixelesComprimidos),
+    	image(Alto,Ancho, PixelesComprimidos, ImageComprimida);
+    image(Alto,Ancho, ListaPixeles, Image),
+    imageToHistogram(Image, Histograma),
+    color_histograma( Histograma, Color),
+    colores(ListaPixeles,Color,_,PixelesComprimidos),
+    image(Alto,Ancho, PixelesComprimidos, ImageComprimida).

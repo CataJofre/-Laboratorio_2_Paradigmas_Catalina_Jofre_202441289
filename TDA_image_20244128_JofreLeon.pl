@@ -1,4 +1,4 @@
-:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2 ]).
+:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2 ]).
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
 :- use_module(tda_pixrgb_20244128_JofreLeon).
@@ -194,7 +194,28 @@ contar_elemento([Elemento|Cola],[ElementoSalida|ColaResultado]) :-
 % Dominio:
 % Recorrido:
 % Descripcion:
+rotate_Aux(_,[], []).
+rotate_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|ColaResultado]):-
+  	X1 is (Ancho - 1) - Y ,
+    Y1 is X, 
+    Color1 is Color,
+    Profundidad1 is Profundidad,
+   rotate_Aux(Ancho, Cola, ColaResultado).
 
+ /*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:   
+    
+rotate_AuxRGB(_,[], []).
+rotate_AuxRGB(Ancho,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad1]|ColaResultado]):-
+  	X1 is (Ancho - 1) - Y ,
+    Y1 is X, 
+    R1 is R,
+    G1 is G,
+    B1 is B,
+    Profundidad1 is Profundidad,
+    rotate_AuxRGB(Ancho, Cola, ColaResultado).   
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
@@ -277,3 +298,22 @@ imageToHistogram(Image, Histograma):-
         seleccionar_bit(ListaPixeles, PixelesBit),
         ordenar_lista(PixelesBit,PixelesBitOrdenados),
         contar_elemento(PixelesBitOrdenados, Histograma).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+
+imageRotate90(Image, I):-
+    % si la imagen es de tipo hexmap se llama al predicado auxiliar rotate_AuxRGB
+    imageIsPixmap(Image)->  
+    	image( Ancho,Alto, PixelsIn, Image),
+    	rotate_AuxRGB(Alto,PixelsIn, PixelsOut),
+    	ordenar_segun_x(PixelsOut,PixelsOutOrdenado),
+    	image(Ancho, Alto, PixelsOutOrdenado, I);
+    % sino se llama al predicado rotate_Aux
+    image(Ancho,Alto, PixelsIn, Image), 
+    rotate_Aux(Alto,PixelsIn, PixelsOut), 
+   	ordenar_segun_x(PixelsOut,PixelsOutOrdenado),
+    image(Ancho, Alto, PixelsOutOrdenado, I).

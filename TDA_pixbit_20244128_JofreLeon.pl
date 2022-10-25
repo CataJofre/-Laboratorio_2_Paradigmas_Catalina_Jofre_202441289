@@ -1,4 +1,4 @@
-:- module(tda_pixbit_20244128_JofreLeon,[pixbit/5, imageIsBitmap/1]).
+:- module(tda_pixbit_20244128_JofreLeon,[pixbit/5, imageIsBitmap/1,seleccionar_bit/2]).
 
 
 /*-----------------------------------------------------REPRESENTACION--------------------------------------*/
@@ -31,7 +31,11 @@ imageIsBitmap([_,_, [[_,_, Bit,_]|_]]) :-
 /*--------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
-% Descripcion:
+% Descripcion: Pone todos los bits en una lista
+
+seleccionar_bit([],[]).    
+seleccionar_bit([[_,_,Bit,_]|Cola],[Bit|ColaResultado]):-
+  	seleccionar_bit(Cola,ColaResultado).
 
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
 /*--------------------------------------PREDICADO ------------------------------------------------------*/

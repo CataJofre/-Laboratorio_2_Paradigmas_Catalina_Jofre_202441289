@@ -1,4 +1,4 @@
-:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2 ]).
+:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2 ]).
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
 :- use_module(tda_pixrgb_20244128_JofreLeon).
@@ -68,6 +68,13 @@ ordenar_segun_y(Lista_pixeles, Pixeles_ordenados):-
 ordenar_segun_x(Lista_pixeles, Pixeles_ordenados):-
     sort(1, @=<, Lista_pixeles, Pixeles_ordenados).
 
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+ordenar_lista(Lista, ListaOrdenada):-
+    sort(0, @=<, Lista,ListaOrdenada).
 
 /*-------------------------------------PREDICADO FLIPH_AUX------------------------------------------------------*/
 % Dominio: dato tipo int que corresponde al ancho y una lista de tamaño 4 con la informacion de los  pixeles
@@ -157,6 +164,47 @@ cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados ):-
 	Xa is X1 * Alto + 1 , Ya is Y1 *Y2 + 1,
     	Xb is (X2 + 1)* Alto, Yb is Y2  * Alto, crop(ListaPixeles, Xa,Ya, Xb,Yb, PixelesSeleccionados).
 
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+contar(Elemento,[],[],1,[Elemento,1]).
+contar(Elemento,[],[],Cantidad,[Elemento,Cantidad]) :- 
+    Cantidad >= 1.
+contar(Elemento,[ElementoSiguiente|ListaResultante],[ElementoSiguiente|ListaResultante],1,[Elemento,1]) :- 
+    Elemento \= ElementoSiguiente.
+contar(Elemento,[ElementoSiguiente|ListaResultante],[ElementoSiguiente|ListaResultante],Cantidad,[Elemento,Cantidad]) :- 
+    Cantidad >= 1, Elemento \= ElementoSiguiente.
+contar(Elemento,[Elemento|Cola],ListaResultante,Contador,Resultado) :- 
+    Contador1 is Contador + 1, 
+    contar(Elemento,Cola,ListaResultante,Contador1,Resultado).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+contar_elemento([],[]).
+contar_elemento([Elemento|Cola],[ElementoSalida|ColaResultado]) :- 
+    contar(Elemento,Cola,ListaResultante,1,ElementoSalida), 
+    contar_elemento(ListaResultante,ColaResultado).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+
 /*-------------------------------------PREDICADO FLIPH------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
 % Recorrido:Imagen (lista con el ancho, alto y los pixeles) pero modificada.
@@ -206,3 +254,26 @@ imageRGBToHex(Image, Image2):-
   	rgb_hex(ListaPixeles, PixelesAHex),
     image(Ancho,Alto, PixelesAHex, Image2).
     
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+
+imageToHistogram(Image, Histograma):-
+    imageIsHexmap(Image)->  
+		image(_,_, ListaPixeles, Image),
+        seleccionar_hex(ListaPixeles, PixelesHex),
+        ordenar_lista(PixelesHex,PixelesHexOrdenados),
+        contar_elemento(PixelesHexOrdenados, Histograma);
+    imageIsPixmap(Image)->  
+		image(_,_, ListaPixeles, Image),
+        seleccionar_rgb(ListaPixeles, PixelesRGB),
+        ordenar_lista(PixelesRGB,PixelesRGBOrdenados),
+        contar_elemento(PixelesRGBOrdenados, Histograma);
+    imageIsBitmap(Image)->  
+		image(_,_, ListaPixeles, Image),
+        seleccionar_bit(ListaPixeles, PixelesBit),
+        ordenar_lista(PixelesBit,PixelesBitOrdenados),
+        contar_elemento(PixelesBitOrdenados, Histograma).

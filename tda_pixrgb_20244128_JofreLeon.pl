@@ -1,4 +1,4 @@
-:- module(tda_pixrgb_20244128_JofreLeon,[pixrgb/7,imageIsPixmap/1]).
+:- module(tda_pixrgb_20244128_JofreLeon,[pixrgb/7,imageIsPixmap/1,seleccionar_rgb/2]).
 /*-----------------------------------------------------TDA PIXRGB-------------------------------------------*/
 % Este archivo corresponde al TDA pixrgb, se encuentran todas los predicados necesarios para su creacion, 
 % tambien los predicados organizados segun estructura.
@@ -35,8 +35,11 @@ imageIsPixmap([_,_, [[_,_,R,G,B,_]|_]]) :-
 /*-------------------------------------- PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
-% Descripcion:
+% Descripcion: guarda los colores en una lista 
 
+seleccionar_rgb([],[]).    
+seleccionar_rgb([[_,_,R,G,B,_]|Cola],[[R,G,B]|ColaResultado]):-
+  	seleccionar_rgb(Cola,ColaResultado).
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
 /*-------------------------------------- PREDICADO ------------------------------------------------------*/
 % Dominio:

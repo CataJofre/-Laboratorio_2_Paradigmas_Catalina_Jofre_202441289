@@ -1,4 +1,4 @@
-:- module(tda_pixhex_20244128_JofreLeon,[pixhex/5, imageIsHexmap/1, rgb_hex/2]).
+:- module(tda_pixhex_20244128_JofreLeon,[pixhex/5, imageIsHexmap/1, rgb_hex/2,seleccionar_hex/2]).
 /*-----------------------------------------------------TDA PIXHEX-------------------------------------------*/
 % Este archivo corresponde al TDA pixhex, se encuentran todas los predicados necesarios para su creacion, 
 % tambien los predicados organizados segun estructura.
@@ -52,7 +52,11 @@ imageIsHexmap([_,_, [[_,_, Hex,_]|_]]) :-
 /*--------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Recorrido:
-% Descripcion:
+% Descripcion: todos los colores hex en una lista 
+
+seleccionar_hex([],[]).    
+seleccionar_hex([[_,_,Hex,_]|Cola],[Hex|ColaResultado]):-
+  	seleccionar_hex(Cola,ColaResultado).
 
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
 /*--------------------------------------PREDICADO ------------------------------------------------------*/

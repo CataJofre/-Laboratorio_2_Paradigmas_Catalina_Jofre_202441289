@@ -123,6 +123,50 @@ color_histograma_rgb( [[[R,G,B],_]|_], R,G,B).
 % Recorrido:
 % Descripcion:
 
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+eliminar_pixel_rgb([], _, _,[]).
+eliminar_pixel_rgb([[X,Y,_,_,_,_]|Cola], X2,Y2, Resultado):- 
+   X == X2, Y == Y2 ->   
+   eliminar_pixel_rgb(Cola,X2,Y2, Resultado). 
+eliminar_pixel_rgb([[X,Y,R,G,B, Profundidad]|Cola], X2,Y2, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
+    eliminar_pixel_rgb(Cola, X2,Y2, Resultado).
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+eliminar_pixel([], _, _,[]).
+eliminar_pixel([[X,Y,_,_]|Cola], X2,Y2, Resultado):- 
+   X == X2, Y == Y2 ->   
+   eliminar_pixel(Cola,X2,Y2, Resultado). 
+eliminar_pixel([[X,Y,Color, Profundidad]|Cola], X2,Y2, [[X, Y, Color, Profundidad]|Resultado]):- 
+    eliminar_pixel(Cola, X2,Y2, Resultado).
+    
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+agregar_pixel_rgb(ListaPixeles, [X,Y,R,G,B, Profundidad], Image2):-
+    eliminar_pixel_rgb(ListaPixeles, X,Y, Resultado),
+    append(Resultado, [[X,Y,R,G,B, Profundidad]], Imag),
+    ordenar_segun_x(Imag,Image2).
+    /*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+agregar_pixel(ListaPixeles, [X,Y,Color, Profundidad], Image2):-
+    eliminar_pixel_rgb(ListaPixeles, X,Y, Resultado),
+    append(Resultado, [[X,Y,Color, Profundidad]], Imag),
+    ordenar_segun_x(Imag,Image2).
+
 /*-----------------------------------------------------OTROS PREDICADOS------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -147,6 +191,16 @@ ordenar_segun_x(Lista_pixeles, Pixeles_ordenados):-
 
 ordenar_lista(Lista, ListaOrdenada):-
     sort(0, @=<, Lista,ListaOrdenada).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+largo_lista([],0).
+largo_lista([_|Cola],Contador) :- 
+    largo_lista(Cola,Contador1), 
+   Contador is Contador1 + 1.
 
 /*-------------------------------------PREDICADO FLIPH_AUX------------------------------------------------------*/
 % Dominio: dato tipo int que corresponde al ancho y una lista de tamaño 4 con la informacion de los  pixeles
@@ -409,3 +463,32 @@ imageCompress(Image, ImageComprimida):-
     color_histograma( Histograma, Color),
     colores(ListaPixeles,Color,_,PixelesComprimidos),
     image(Alto,Ancho, PixelesComprimidos, ImageComprimida).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+imageIsCompressed(Image):-
+    image(Alto,Ancho, ListaPixeles,Image),
+    Total is Alto * Ancho,
+    largo_lista(ListaPixeles, Largo),
+    Total == Largo ->  writeln('#f');
+    writeln('#t').
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+imageChangePixel(Image, Pixel, ImagenModificada):-
+    largo_lista(Pixel, Largo),
+    Largo==6 ->  
+		image(Alto,Ancho, ListaPixeles, Image),
+		agregar_pixel_rgb(ListaPixeles, Pixel, ListaNueva),
+		image(Alto,Ancho, ListaNueva, ImagenModificada);
+    image(Alto,Ancho, ListaPixeles, Image),
+    agregar_pixel(ListaPixeles, Pixel, ListaNueva),
+    image(Alto,Ancho, ListaNueva, ImagenModificada).
+    
+

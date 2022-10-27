@@ -352,6 +352,88 @@ rotate_AuxRGB(Ancho,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad
 % Descripcion:
 
 
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+
+impar(N):- 
+    mod(N,2) =:= 0.
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+agregar_salto(Lista,Alto,ListaConSalto):-
+    agregar_salto(Lista,Alto,ListaConSalto,Alto).
+agregar_salto([],_,[],_).
+agregar_salto([_|Cola],Alto,["\n",ColaResultado],0):- 
+    agregar_salto(Cola,Alto,ColaResultado,Alto).
+agregar_salto([Cabeza|Cola],Alto,[Cabeza|ColaResultado],Contador):- 
+    Contador > 0,
+    Contador1 is Contador - 1, 
+    agregar_salto(Cola,Alto,ColaResultado,Contador1).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+agregar_tab([],[]) .      
+agregar_tab([Cabeza|Cola],[Cabeza,"\t"|ColaResultado]):- 
+    agregar_tab(Cola,ColaResultado).
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+pixeles_a_string_hex(ListaPixeles, Alto, ListaString):-
+    impar(Alto) ->  
+    	seleccionar_hex(ListaPixeles, Pixeles),
+    	agregar_tab(Pixeles, PixTab),
+    	agregar_salto(PixTab, (Alto+1), PixSalto),
+    	flatten(PixSalto, PixLista),
+    	atomics_to_string(PixLista, ListaString);
+    seleccionar_hex(ListaPixeles, Pixeles),
+    agregar_tab(Pixeles, PixTab),
+    agregar_salto(PixTab, Alto, PixSalto),
+    flatten(PixSalto, PixLista),
+    atomics_to_string(PixLista, ListaString).
+    
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+pixeles_a_string_bit(ListaPixeles, Alto, ListaString):-
+    impar(Alto) ->  
+    	seleccionar_bit(ListaPixeles, Pixeles),
+   		agregar_tab(Pixeles, PixTab),
+    	agregar_salto(PixTab, (Alto + 1) , PixSalto),
+    	flatten(PixSalto, PixLista),
+    	atomics_to_string(PixLista, ListaString);
+    seleccionar_bit(ListaPixeles, Pixeles),
+   	agregar_tab(Pixeles, PixTab),
+    agregar_salto(PixTab, Alto , PixSalto),
+    flatten(PixSalto, PixLista),
+    atomics_to_string(PixLista, ListaString).
+
+
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+pixeles_a_string_rgb(ListaPixeles, Alto, ListaString):-
+    impar(Alto) ->  
+    	seleccionar_rgb(ListaPixeles, Pixeles),
+    	agregar_tab(Pixeles, PixTab),
+   		agregar_salto(PixTab, (Alto+1), PixSalto),
+    	flatten(PixSalto, PixLista),
+    	atomics_to_string(PixLista, ListaString);
+    seleccionar_rgb(ListaPixeles, Pixeles),
+    agregar_tab(Pixeles, PixTab),
+    agregar_salto(PixTab, Alto, PixSalto),
+    flatten(PixSalto, PixLista),
+    atomics_to_string(PixLista, ListaString).
+
 /*-------------------------------------PREDICADO FLIPH------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
 % Recorrido:Imagen (lista con el ancho, alto y los pixeles) pero modificada.
@@ -491,4 +573,26 @@ imageChangePixel(Image, Pixel, ImagenModificada):-
     agregar_pixel(ListaPixeles, Pixel, ListaNueva),
     image(Alto,Ancho, ListaNueva, ImagenModificada).
     
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:  
+    invertColorRGB([X,Y,R,G,B,Profundidad],[X,Y,R2,G2,B2,Profundidad]):-
+    R2 is 255- R,
+    G2 is 255- G,
+    B2 is 255- B.
 
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Recorrido:
+% Descripcion:
+ imageToString(Image, ImageEnString):-
+    imageIsPixmap(Image)->  
+    	image(_,Alto,ListaPixeles,Image),
+    	pixeles_a_string_rgb(ListaPixeles, Alto, ImageEnString);
+    imageIsBitmap(Image)->  
+    	image(_,Alto,ListaPixeles,Image),
+    	pixeles_a_string_bit(ListaPixeles, Alto, ImageEnString);
+    imageIsHexmap(Image)->  
+    	image(_,Alto,ListaPixeles,Image),
+    	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString).

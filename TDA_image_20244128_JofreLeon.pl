@@ -814,3 +814,7 @@ imageDepthLayers(Image, ImageEnCapas):-
     insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
     separar_capas_hex(ListaPixeles,ListaPixelesSeparados),
     insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)).
+
+
+imageDecompress([Ancho,Alto,Pixeles] , PixelesEliminados , [Ancho,Alto,ImagenDescomprimida]) :- 
+    append(Pixeles,PixelesEliminados,ImagenDescomprimida).

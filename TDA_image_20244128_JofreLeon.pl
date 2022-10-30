@@ -596,3 +596,221 @@ imageChangePixel(Image, Pixel, ImagenModificada):-
     imageIsHexmap(Image)->  
     	image(_,Alto,ListaPixeles,Image),
     	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString).
+
+
+
+
+quitar_primer_pixel([_|Tail], Tail).
+
+seleccionar_profundidad_hex(ListaProfundidad, ListaSinDulplicas):-
+    seleccionar_profundidad_hex_1(ListaProfundidad,Lista),
+    sort(Lista, ListaSinDulplicas).
+seleccionar_profundidad_hex_1([],[]).    
+seleccionar_profundidad_hex_1([[_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
+  	seleccionar_profundidad_hex_1(Cola,ColaResultado).
+
+
+seleccionar_profundidad_bit(ListaProfundidad, ListaSinDulplicas):-
+    seleccionar_profundidad_bit_1(ListaProfundidad,Lista),
+    sort(Lista, ListaSinDulplicas).
+seleccionar_profundidad_bit_1([],[]).    
+seleccionar_profundidad_bit_1([[_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
+  	seleccionar_profundidad_bit_1(Cola,ColaResultado).
+
+
+seleccionar_profundidad_rgb(ListaProfundidad, ListaSinDulplicas):-
+    seleccionar_profundidad_rgb_1(ListaProfundidad,Lista),
+    sort(Lista, ListaSinDulplicas).
+seleccionar_profundidad_rgb_1([],[]).    
+seleccionar_profundidad_rgb_1([[_,_,_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
+  	seleccionar_profundidad_rgb_1(Cola,ColaResultado).
+
+pixeles_en_blanco_bit([],[]).
+pixeles_en_blanco_bit([[X,Y,_,_]|Cola], [[X,Y,1,0]|Cabeza]):-
+    pixeles_en_blanco_bit(Cola,Cabeza).
+
+pixeles_en_blanco_hex([],[]).
+pixeles_en_blanco_hex([[X,Y,_,_]|Cola], [[X,Y,"#FFFFFF",0]|Cabeza]):-
+    pixeles_en_blanco_hex(Cola,Cabeza).
+
+pixeles_en_blanco_rgb([],[]).
+pixeles_en_blanco_rgb([[X,Y,_,_,_,_]|Cola], [[X,Y,255,255,255,0]|Cabeza]):-
+    pixeles_en_blanco_rgb(Cola,Cabeza).
+
+
+pixeles_primera_posicion_rgb([],[]).
+pixeles_primera_posicion_rgb([[_,_,R,G,B,Profundidad]|Cola], [[0,0,R,G,B,Profundidad]|Cabeza]):-
+ pixeles_primera_posicion_rgb(Cola,Cabeza).
+
+pixeles_primera_posicion_hex([],[]).
+pixeles_primera_posicion_hex([[_,_,Hex,Profundidad]|Cola], [[0,0,Hex,Profundidad]|Cabeza]):-
+ pixeles_primera_posicion_hex(Cola,Cabeza).
+
+pixeles_primera_posicion_bit([],[]).
+pixeles_primera_posicion_bit([[_,_,Bit,Profundidad]|Cola], [[0,0,Bit,Profundidad]|Cabeza]):-
+ pixeles_primera_posicion_bit(Cola,Cabeza).
+
+
+
+agregar_profundidad_rgb([],_,[]).      
+agregar_profundidad_rgb([[X, Y, R,G,B,_]|Cola],Profundidad,[[X, Y, R,G,B,Profundidad]|ColaResultado]) :- 
+      agregar_profundidad_rgb(Cola,Profundidad,ColaResultado).
+
+agregar_profundidad_hex([],_,[]).      
+agregar_profundidad_hex([[X, Y, Hex,_]|Cola],Profundidad,[[X, Y, Hex,Profundidad]|ColaResultado]) :- 
+      agregar_profundidad_hex(Cola,Profundidad,ColaResultado).
+
+agregar_profundidad_bit([],_,[]).      
+agregar_profundidad_bit([[X, Y,Bit ,_]|Cola],Profundidad,[[X, Y, Bit,Profundidad]|ColaResultado]) :- 
+      agregar_profundidad_bit(Cola,Profundidad,ColaResultado).
+
+
+insertar_pixeles_blancos_rgb([],_,[]) .      
+insertar_pixeles_blancos_rgb([[X,Y,R,G,B,Profundidad]|Cola],PixelesBlancos,[[[X,Y,R,G,B,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
+    agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
+    insertar_pixeles_blancos_rgb(Cola,PixelesBlancos,ColaResultado).
+
+insertar_pixeles_blancos_hex([],_,[]) .      
+insertar_pixeles_blancos_hex([[X,Y,Hex ,Profundidad]|Cola],PixelesBlancos,[[[X,Y,Hex ,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
+    agregar_profundidad_hex(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
+    insertar_pixeles_blancos_hex(Cola,PixelesBlancos,ColaResultado).
+
+insertar_pixeles_blancos_bit([],_,[]) .      
+insertar_pixeles_blancos_bit([[X,Y,Bit ,Profundidad]|Cola],PixelesBlancos,[[[X,Y,Bit ,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
+    agregar_profundidad_bit(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
+    insertar_pixeles_blancos_bit(Cola,PixelesBlancos,ColaResultado).
+
+insertar_pixeles_blancos_profundidad_repetida_rgb( [],_,[]) .      
+insertar_pixeles_blancos_profundidad_repetida_rgb( [[[X,Y,R,G,B,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado] ) :- 
+    agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesConProfundidad),
+    append([[X,Y,R,G,B,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
+   insertar_pixeles_blancos_profundidad_repetida_rgb(Cola,PixelesBlancos,ColaResultado).
+
+insertar_pixeles_blancos_profundidad_repetida_hex( [],_,[]) .      
+insertar_pixeles_blancos_profundidad_repetida_hex( [[[X,Y,Hex ,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado] ) :- 
+    agregar_profundidad_hex(PixelesBlancos,Profundidad,PixelesConProfundidad),
+    append([[X,Y, Hex,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
+   insertar_pixeles_blancos_profundidad_repetida_hex(Cola,PixelesBlancos,ColaResultado).
+
+insertar_pixeles_blancos_profundidad_repetida_bit( [],_,[]) .      
+insertar_pixeles_blancos_profundidad_repetida_bit( [[[X,Y,Bit ,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado] ) :- 
+    agregar_profundidad_bit(PixelesBlancos,Profundidad,PixelesConProfundidad),
+    append([[X,Y,Bit,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
+   insertar_pixeles_blancos_profundidad_repetida_bit(Cola,PixelesBlancos,ColaResultado).
+
+
+
+
+
+
+insertarAnchoAlto(_,_,[],[]).
+insertarAnchoAlto(Ancho,Alto,[Pixeles|Cola], [[Ancho,Alto, Pixeles]|ColaResultado]):-
+    insertarAnchoAlto(Ancho,Alto,Cola,ColaResultado).
+
+invertir([],[]).
+invertir([Cabeza| Cola], [CabezaInvertida|ColaResultado]):-   
+    reverse(Cabeza,CabezaInvertida),
+    invertir(Cola,ColaResultado).
+
+ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados):-
+    invertir(ListaPixeles,ListaPixelesInvertidos),
+	sort(0, @=<, ListaPixelesInvertidos, ListaPixelesOrdenadosInvertidos),
+	invertir(ListaPixelesOrdenadosInvertidos,ListaPixelesOrdenados).
+
+agrupar_por_profundidad(ListaPixles,ListaAgrupada):-
+    agrupar(ListaPixles,[],ListaAgrupada).
+
+agrupar([],[],[]).
+agrupar([ListaPixel],ListaPixeles,[PixelesConMismaProfundidad]):- 
+    append([ListaPixel],ListaPixeles,PixelesConMismaProfundidad).
+
+agrupar([ListaPixel,ListaPixel1|Cola],PixelesConMismaProfundidad,PixelesConMismaProfundidadLista):- 
+    last(ListaPixel,Profundidad),  
+    last(ListaPixel1,Profundidad1),
+    Profundidad== Profundidad1 , 
+    append([ListaPixel],PixelesConMismaProfundidad,PixelesConMismaProfundidad1) , 
+   	agrupar([ListaPixel1|Cola],PixelesConMismaProfundidad1,PixelesConMismaProfundidadLista).
+
+agrupar([ListaPixel,ListaPixel1|Cola],PixelesConDistintaProfundidad,[PixelesConDistintaProfundidad1|ColaResultado]):- 
+    last(ListaPixel,Profundidad),  
+    last(ListaPixel1,Profundidad1),
+    Profundidad\=Profundidad1 ,
+    append([ListaPixel],PixelesConDistintaProfundidad,PixelesConDistintaProfundidad1) ,
+ 	agrupar([ListaPixel1|Cola],[],ColaResultado).
+
+	
+
+
+separar_capas_repeticion_profundidades_rgb(ListaPixeles,ListaPixelesSeparados):-
+     ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados),
+    agrupar_por_profundidad(ListaPixelesOrdenados,ListaPixelesAgrupados),
+	pixeles_en_blanco_rgb(ListaPixeles,ListaPixelesBlancos),
+	quitar_primer_pixel(ListaPixelesBlancos,ListaPixelesBlancos2),
+	insertar_pixeles_blancos_profundidad_repetida_rgb(ListaPixelesAgrupados,ListaPixelesBlancos2,ListaPixelesSeparados),!.
+
+separar_capas_rgb(Lista, Lista2):-
+    pixeles_primera_posicion_rgb(Lista,T),
+    pixeles_en_blanco_rgb(Lista,R),
+    quitar_primer_pixel(R,R2),
+    insertar_pixeles_blancos_rgb(T,R2,Lista2),!.
+    
+ 
+
+separar_capas_repeticion_profundidades_hex(ListaPixeles,ListaPixelesSeparados):-
+     ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados),
+    agrupar_por_profundidad(ListaPixelesOrdenados,ListaPixelesAgrupados),
+	pixeles_en_blanco_hex(ListaPixeles,ListaPixelesBlancos),
+	quitar_primer_pixel(ListaPixelesBlancos,ListaPixelesBlancos2),
+	insertar_pixeles_blancos_profundidad_repetida_hex(ListaPixelesAgrupados,ListaPixelesBlancos2,ListaPixelesSeparados),!.
+
+separar_capas_hex(Lista, Lista2):-
+    pixeles_primera_posicion_hex(Lista,T),
+    pixeles_en_blanco_hex(Lista,R),
+    quitar_primer_pixel(R,R2),
+    insertar_pixeles_blancos_hex(T,R2,Lista2),!.
+
+
+separar_capas_repeticion_profundidades_bit(ListaPixeles,ListaPixelesSeparados):-
+    ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados),
+    agrupar_por_profundidad(ListaPixelesOrdenados,ListaPixelesAgrupados),
+	pixeles_en_blanco_bit(ListaPixeles,ListaPixelesBlancos),
+	quitar_primer_pixel(ListaPixelesBlancos,ListaPixelesBlancos2),
+	insertar_pixeles_blancos_profundidad_repetida_bit(ListaPixelesAgrupados,ListaPixelesBlancos2,ListaPixelesSeparados),!.
+
+separar_capas_bit(Lista, Lista2):-
+    pixeles_primera_posicion_bit(Lista,T),
+    pixeles_en_blanco_bit(Lista,R),
+    quitar_primer_pixel(R,R2),
+    insertar_pixeles_blancos_bit(T,R2,Lista2),!.
+
+imageDepthLayers(Image, ImageEnCapas):-
+       imageIsPixmap(Image)->  
+    image(Ancho,Alto,ListaPixeles,Image),
+     seleccionar_profundidad_rgb(ListaPixeles,Profundidades),
+    (   length(Profundidades,LargoProfundidades),
+    LargoProfundidades < Ancho * Alto ->  
+    
+    separar_capas_repeticion_profundidades_rgb(ListaPixeles,ListaPixelesSeparados),
+    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
+    separar_capas_rgb(ListaPixeles,ListaPixelesSeparados),
+    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
+    
+    imageIsBitmap(Image)->  
+    image(Ancho,Alto,ListaPixeles,Image),
+     seleccionar_profundidad_bit(ListaPixeles,Profundidades),
+     (   length(Profundidades,LargoProfundidades),
+    LargoProfundidades< Ancho * Alto ->  
+    separar_capas_repeticion_profundidades_bit(ListaPixeles,ListaPixelesSeparados),
+    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
+    separar_capas_bit(ListaPixeles,ListaPixelesSeparados),
+    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
+    
+    imageIsHexmap(Image)->  
+    image(Ancho,Alto,ListaPixeles,Image),
+     seleccionar_profundidad_hex(ListaPixeles,Profundidades),
+     (   length(Profundidades,LargoProfundidades),
+    LargoProfundidades< Ancho * Alto ->  
+    separar_capas_repeticion_profundidades_hex(ListaPixeles,ListaPixelesSeparados),
+    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
+    separar_capas_hex(ListaPixeles,ListaPixelesSeparados),
+    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)).

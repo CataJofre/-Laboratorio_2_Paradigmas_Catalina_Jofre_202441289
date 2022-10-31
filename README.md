@@ -1,2 +1,2 @@
 # -Laboratorio_2_Paradigmas
-Laboratorio 2 de paradigmas de programación, es un editor de imágenes realizado en Prolog con paradigma lógico
+Laboratorio 2 de paradigmas de programación, es un editor de imágenes realizado en Prolog con paradigma lógico, consta de 5 archivos, 4 corresponden a "TDA Image", "TDA Pixbit", "TDA Pixhex" y "TDA Pixrgb", el quinto es un archivo donde se ponen a prueba el correcto funcionamiento de los predicados creados con diversos ejercicios. Catalina Jofré León 20.244.128-9 Sección C3.

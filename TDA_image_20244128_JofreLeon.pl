@@ -1,5 +1,7 @@
+% Predicado para exportar los predicados al script de pruebas.
 :- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2,imageCompress/3,imageChangePixel/3,imageToString/2,
                                         imageDepthLayers/2,imageDecompress/3 ]).
+% Predicados para importar los predicados de los otros archivos.
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
 :- use_module(tda_pixrgb_20244128_JofreLeon).
@@ -135,10 +137,9 @@ largo_lista([_|Cola],Contador) :-
 % Tipo de Meta: Secundaria.
 
 flipH_Aux(_,[], []).
-flipH_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|ColaResultado]):-
+flipH_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color,Profundidad1]|ColaResultado]):-
   	X1 is (Ancho - 1) - X ,
     Y1 is Y, 
-    Color1 is Color,
     Profundidad1 is Profundidad,
     flipH_Aux(Ancho, Cola, ColaResultado).
 
@@ -149,10 +150,9 @@ flipH_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|Col
 % Tipo de Meta: Secundaria.
 
 flipV_Aux(_,[], []).
-flipV_Aux(Alto,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|ColaResultado]):-
+flipV_Aux(Alto,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color,Profundidad1]|ColaResultado]):-
   	X1 is  X ,
     Y1 is (Alto - 1) - Y, 
-    Color1 is Color,
     Profundidad1 is Profundidad,
     flipV_Aux(Alto, Cola, ColaResultado).
 
@@ -213,10 +213,9 @@ contar_elemento([Elemento|Cola],[ElementoSalida|ColaResultado]) :-
 % Descripcion:
 
 rotate_Aux(_,[], []).
-rotate_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|ColaResultado]):-
+rotate_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color,Profundidad1]|ColaResultado]):-
   	X1 is (Ancho - 1) - Y ,
     Y1 is X, 
-    Color1 is Color,
     Profundidad1 is Profundidad,
    rotate_Aux(Ancho, Cola, ColaResultado).
 
@@ -337,11 +336,12 @@ imageIsCompressed(Image):-
 % Tipo de Meta: Primaria
 
 imageFlipH(Image, I):-
-    % si la imagen es de tipo hexmap se llama a laPREDICADO auxiliar flipH_AuxRGB
+    imageIsHexmap(Image)->  
+    	image(Ancho, Alto, PixelsIn, Image), flipH_Aux(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I);
+    imageIsBitmap(Image)->  
+    	image(Ancho, Alto, PixelsIn, Image), flipH_Aux(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I);
     imageIsPixmap(Image)->  
-    image(Ancho, Alto, PixelsIn, Image), flipH_AuxRGB(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I);
-    % sino se llama a laPREDICADO flipH_Aux
-    image(Ancho, Alto, PixelsIn, Image), flipH_Aux(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I).
+    	image(Ancho, Alto, PixelsIn, Image), flipH_AuxRGB(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I).
 
 /*------------------------------------- PREDICADO FLIPV------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
@@ -349,11 +349,12 @@ imageFlipH(Image, I):-
 % Tipo de Meta: Primaria
 
 imageFlipV(Image, I):-
-    % si la imagen es de tipo hexmap se llama a laPREDICADO auxiliar flipV_AuxRGB
+ imageIsHexmap(Image)->  
+    	image(Ancho, Alto, PixelsIn, Image), flipV_Aux(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I);
+    imageIsBitmap(Image)->  
+    	image(Ancho, Alto, PixelsIn, Image), flipV_Aux(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I);
     imageIsPixmap(Image)->  
-    image( Ancho,Alto, PixelsIn, Image), flipV_AuxRGB(Alto,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I);
-    % sino se llama a laPREDICADO flipV_Aux
-    image(Ancho,Alto, PixelsIn, Image), flipV_Aux(Alto,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I).
+    	image(Ancho, Alto, PixelsIn, Image), flipV_AuxRGB(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I).
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -446,17 +447,16 @@ imageChangePixel(Image, Pixel, ImagenModificada):-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
- imageToString(Image, ImageEnString):-
-    imageIsPixmap(Image)->  
+imageToString(Image, ImageEnString):-
+    imageIsHexmap(Image)->  
+    	image(_,Alto,ListaPixeles,Image),
+    	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString);
+     imageIsPixmap(Image)->  
     	image(_,Alto,ListaPixeles,Image),
     	pixeles_a_string_rgb(ListaPixeles, Alto, ImageEnString);
     imageIsBitmap(Image)->  
     	image(_,Alto,ListaPixeles,Image),
-    	pixeles_a_string_bit(ListaPixeles, Alto, ImageEnString);
-    imageIsHexmap(Image)->  
-    	image(_,Alto,ListaPixeles,Image),
-    	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString).
-
+    	pixeles_a_string_bit(ListaPixeles, Alto, ImageEnString).
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -496,5 +496,6 @@ imageDepthLayers(Image, ImageEnCapas):-
 % Descripcion:
 imageDecompress([Ancho,Alto,Pixeles] , PixelesEliminados , [Ancho,Alto,ImagenDescomprimida]) :- 
     append(Pixeles,PixelesEliminados,ImagenDesordenada),
-    ordenar_segun_x(ImagenDesordenada,ImagenDescomprimida).
+    ordenar_segun_y(ImagenDesordenada,ImagenDesordenada1),
+    ordenar_segun_x(ImagenDesordenada1,ImagenDescomprimida).
 

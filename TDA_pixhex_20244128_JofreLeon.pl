@@ -1,5 +1,7 @@
+% Predicado para exportar los predicados a otros archivos.
 :- module(tda_pixhex_20244128_JofreLeon,[pixhex/5, imageIsHexmap/1, rgb_hex/2,seleccionar_hex/2,pixeles_a_string_hex/3,seleccionar_profundidad_hex/2,pixeles_en_blanco_hex/2,pixeles_primera_posicion_hex/2,
                                         agregar_profundidad_hex/3,insertar_pixeles_blancos_hex/3,insertar_pixeles_blancos_profundidad_repetida_hex/3,separar_capas_repeticion_profundidades_hex/2,separar_capas_hex/2]).
+
 /*-----------------------------------------------------TDA PIXHEX-------------------------------------------
 Este archivo corresponde al TDA pixrhex, se encuentran todos los predicados necesarios para su creacion y tambien
 los solicitados en el proyecto de laboratorio.
@@ -9,6 +11,7 @@ y la segunda donde se encuentran todos los predicados del laboratorio.
 
 
 PRIMERA PARTE:  PREDICADOS AUXILIARES O PREDICADOS CON FUNCIONES ESPECIFICAS                                  */
+
 /*-----------------------------------------------------REPRESENTACION--------------------------------------*/
 % El TDA PIXHEX representa la unidad inicial de una imagen tipo HEXMAP  cuyos colores se representan con un
 %  unico valor escrito en forma hexadecimal, ademas de incluir la posicion de de cada pixel,representado
@@ -16,6 +19,8 @@ PRIMERA PARTE:  PREDICADOS AUXILIARES O PREDICADOS CON FUNCIONES ESPECIFICAS    
 % Representacion:
 %  pixhex-d <- x (int) X y (int) X hex(String) X depth
 
+/*-----------------------------------------------------HECHOS--------------------------------------*/
+% Para cada numero calculado de un color de tipo RGB existe su equivalente en hexadecimal.
 % color(Numero de color RGB, HEX)
 color(0.0,"0").
 color(1.0,"1").
@@ -118,16 +123,15 @@ hex(Numero,Hex):-
 
 /*--------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-
 % Descripcion:
-
 
 pixRGB_a_pixHex( [_,_,R,G,B,_], PixelHex):-
     hex(B, HexB),
     hex(G, HexG),
     string_concat(HexG,HexB, Res),
     hex(R, HexR),
-    string_concat(HexR,Res, PixelHex).
+    string_concat(HexR,Res, Pixel),
+    string_concat("#",Pixel, PixelHex).
    
 /*--------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -180,9 +184,6 @@ seleccionar_profundidad_hex_1([[_,_,_,Profundidad]|Cola],[Profundidad|ColaResult
 pixeles_en_blanco_hex([],[]).
 pixeles_en_blanco_hex([[X,Y,_,_]|Cola], [[X,Y,"#FFFFFF",0]|Cabeza]):-
     pixeles_en_blanco_hex(Cola,Cabeza).
- 
-
-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -330,8 +331,7 @@ quitar_primer_pixel([_|Tail], Tail).
 
 imageIsHexmap([_,_, [[_,_, Hex,_]|_]]) :-
    string(Hex)-> 
-    writeln('#t');
-    writeln('#f').
+    writeln('#t').
 
 
 

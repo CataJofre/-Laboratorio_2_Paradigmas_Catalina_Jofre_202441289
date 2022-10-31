@@ -1,3 +1,4 @@
+% Predicado para exportar los predicados a otros archivos.
 :- module(tda_pixbit_20244128_JofreLeon,[pixbit/5, imageIsBitmap/1,seleccionar_bit/2,pixeles_a_string_bit/3,seleccionar_profundidad_bit/2,pixeles_en_blanco_bit/2,pixeles_primera_posicion_bit/2,
                                         agregar_profundidad_bit/3,insertar_pixeles_blancos_bit/3,insertar_pixeles_blancos_profundidad_repetida_bit/3,separar_capas_repeticion_profundidades_bit/2,
                                         separar_capas_bit/2]).
@@ -18,6 +19,7 @@ PRIMERA PARTE:  PREDICADOS AUXILIARES O PREDICADOS CON FUNCIONES ESPECIFICAS    
 % profundidad de estos, ademas de ser la unidad fundamental de una imagen llamada bitmap-d. 
 % Representacion:
 % pixbit-d <- x (int) X y (int) X bit ([0|1]) X depth (int))
+
 /*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
 /*--------------------------------------PREDICADO PIXBIT------------------------------------------------------*/
 % Dominio: 4 numeros de tipo entero
@@ -37,10 +39,6 @@ seleccionar_bit([[_,_,Bit,_]|Cola],[Bit|ColaResultado]):-
   	seleccionar_bit(Cola,ColaResultado).
 
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
-/*--------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-
-% Descripcion:
 
 /*-----------------------------------------------------OTROS PREDICADOS------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
@@ -60,9 +58,6 @@ pixeles_a_string_bit(ListaPixeles, Alto, ListaString):-
     flatten(PixSalto, PixLista),
     atomics_to_string(PixLista, ListaString).
 
-
-
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -74,7 +69,7 @@ seleccionar_profundidad_bit_1([],[]).
 seleccionar_profundidad_bit_1([[_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
   	seleccionar_profundidad_bit_1(Cola,ColaResultado).
 
- /*-------------------------------------PREDICADO ------------------------------------------------------*/
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
  
@@ -82,15 +77,13 @@ pixeles_en_blanco_bit([],[]).
 pixeles_en_blanco_bit([[X,Y,_,_]|Cola], [[X,Y,1,0]|Cabeza]):-
     pixeles_en_blanco_bit(Cola,Cabeza).
 
-
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
  
 pixeles_primera_posicion_bit([],[]).
 pixeles_primera_posicion_bit([[_,_,Bit,Profundidad]|Cola], [[0,0,Bit,Profundidad]|Cabeza]):-
- pixeles_primera_posicion_bit(Cola,Cabeza).
+    pixeles_primera_posicion_bit(Cola,Cabeza).
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -100,7 +93,7 @@ agregar_profundidad_bit([],_,[]).
 agregar_profundidad_bit([[X, Y,Bit ,_]|Cola],Profundidad,[[X, Y, Bit,Profundidad]|ColaResultado]) :- 
       agregar_profundidad_bit(Cola,Profundidad,ColaResultado).
 
- /*-------------------------------------PREDICADO ------------------------------------------------------*/
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
  
@@ -108,7 +101,6 @@ insertar_pixeles_blancos_bit([],_,[]) .
 insertar_pixeles_blancos_bit([[X,Y,Bit ,Profundidad]|Cola],PixelesBlancos,[[[X,Y,Bit ,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
     agregar_profundidad_bit(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
     insertar_pixeles_blancos_bit(Cola,PixelesBlancos,ColaResultado).
-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -119,7 +111,6 @@ insertar_pixeles_blancos_profundidad_repetida_bit( [[[X,Y,Bit ,Profundidad]|Cola
     agregar_profundidad_bit(PixelesBlancos,Profundidad,PixelesConProfundidad),
     append([[X,Y,Bit,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
    insertar_pixeles_blancos_profundidad_repetida_bit(Cola,PixelesBlancos,ColaResultado).
-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -161,6 +152,7 @@ agregar_salto([Cabeza|Cola],Alto,[Cabeza|ColaResultado],Contador):-
 agregar_tab([],[]) .      
 agregar_tab([Cabeza|Cola],[Cabeza,"\t"|ColaResultado]):- 
     agregar_tab(Cola,ColaResultado).
+
 /*-------------------------------------PREDICADO IMPAR------------------------------------------------------*/
 % Dominio: Entero, Alto de la imagen
 % Recorrido: Boolean
@@ -201,7 +193,7 @@ agrupar([ListaPixel,ListaPixel1|Cola],PixelesConDistintaProfundidad,[PixelesConD
     append([ListaPixel],PixelesConDistintaProfundidad,PixelesConDistintaProfundidad1) ,
  	agrupar([ListaPixel1|Cola],[],ColaResultado).
 
-    /*-------------------------------------PREDICADO INVERTIR------------------------------------------------------*/
+/*-------------------------------------PREDICADO INVERTIR------------------------------------------------------*/
 % Dominio: Lista de pixeles.
 % Descripcion: Invierte el orden de los pixeles, dejando la profundidad al principio.
  
@@ -210,12 +202,12 @@ invertir([Cabeza| Cola], [CabezaInvertida|ColaResultado]):-
     reverse(Cabeza,CabezaInvertida),
     invertir(Cola,ColaResultado).
 
-
-    /*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
+/*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
 % Dominio:Lista de pixeles.
 % Descripcion:Elimina el primer pixel de una lista de pixeles.
  
 quitar_primer_pixel([_|Tail], Tail).
+
 /*--------------------------------SEGUNDA PARTE DEL ARCHIVO------------------------------------------------*/
 
 /*              AQUI SE ENCUENTRAN LOS PREDICADOS REQUERIDOS EN EL LABORATORIO                             */
@@ -230,15 +222,6 @@ quitar_primer_pixel([_|Tail], Tail).
 % Descripcion: Si es una imagen del tipo bitxmap retorna true (muestra la imagen), sino retorna false
 
 imageIsBitmap([_,_, [[_,_, Bit,_]|_]]) :-
+    integer(Bit),
     Bit >= 0, Bit < 2-> 
-    writeln('#t');
-    writeln('#f').
-
-
-
-
-
-
-
-
-
+    writeln('#t').

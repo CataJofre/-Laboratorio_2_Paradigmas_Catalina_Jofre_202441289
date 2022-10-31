@@ -1,5 +1,6 @@
+% Predicado para exportar los predicados a otros archivos.
 :- module(tda_pixrgb_20244128_JofreLeon,[pixrgb/7,imageIsPixmap/1,seleccionar_rgb/2,pixeles_a_string_rgb/3,color_frecuente_rgb/5,resto_de_colores_rgb/5,eliminar_pixel_rgb/4,agregar_pixel_rgb/3,
-                                        flipV_AuxRGB/3,rotate_AuxRGB/3,imageInvertColorRGB/2,seleccionar_profundidad_rgb/2,pixeles_en_blanco_rgb/2,pixeles_primera_posicion_rgb/2,agregar_profundidad_rgb/3,
+                                        flipV_AuxRGB/3,flipH_AuxRGB/3,rotate_AuxRGB/3,imageInvertColorRGB/2,seleccionar_profundidad_rgb/2,pixeles_en_blanco_rgb/2,pixeles_primera_posicion_rgb/2,agregar_profundidad_rgb/3,
                                         insertar_pixeles_blancos_rgb/3,insertar_pixeles_blancos_profundidad_repetida_rgb/3,separar_capas_repeticion_profundidades_rgb/2,separar_capas_rgb/2]).
 
 
@@ -27,8 +28,8 @@ PRIMERA PARTE:  PREDICADOS AUXILIARES O PREDICADOS CON FUNCIONES ESPECIFICAS    
 % Descripcion:  PREDICADO constructora del TDA pixbit, que guarda las posiciones, los colores R,G y B, y la profundidad
 
 pixrgb(X, Y, R,G,B, Profundidad, [X, Y, R,G,B, Profundidad]):-
-     integer(X), integer(Y), integer(R), integer(G), integer(B), integer(Profundidad),
-     X >= 0, Y >= 0, R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255,Profundidad >= 0.
+    integer(X), integer(Y), integer(R), integer(G), integer(B), integer(Profundidad),
+    X >= 0, Y >= 0, R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255,Profundidad >= 0.
 
 /*-----------------------------------------------------SELECTORES------------------------------------------*/
 /*-------------------------------------- PREDICADO ------------------------------------------------------*/
@@ -38,6 +39,7 @@ pixrgb(X, Y, R,G,B, Profundidad, [X, Y, R,G,B, Profundidad]):-
 seleccionar_rgb([],[]).    
 seleccionar_rgb([[_,_,R,G,B,_]|Cola],[[R,G,B]|ColaResultado]):-
   	seleccionar_rgb(Cola,ColaResultado).
+
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
 /*-----------------------------------------------------OTROS PREDICADOS------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
@@ -80,8 +82,6 @@ resto_de_colores_rgb([[_,_,R,G,B,_]|Cola], R_frecuente, G_frecuente, B_frecuente
 resto_de_colores_rgb([[X, Y, R,G,B, Profundidad]|Cola], R_frecuente, G_frecuente, B_frecuente, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
     resto_de_colores_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado).
 
-
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -93,7 +93,6 @@ eliminar_pixel_rgb([[X,Y,_,_,_,_]|Cola], X2,Y2, Resultado):-
 eliminar_pixel_rgb([[X,Y,R,G,B, Profundidad]|Cola], X2,Y2, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
     eliminar_pixel_rgb(Cola, X2,Y2, Resultado).
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -102,8 +101,6 @@ agregar_pixel_rgb(ListaPixeles, [X,Y,R,G,B, Profundidad], Image2):-
     eliminar_pixel_rgb(ListaPixeles, X,Y, Resultado),
     append(Resultado, [[X,Y,R,G,B, Profundidad]], Imag),
     ordenar_segun_x(Imag,Image2).
-
-
 
 /*-------------------------------------PREDICADO FLIPV_AUXRGB------------------------------------------------------*/
 % Dominio: dato tipo int que corresponde al alto y una lista de tamaño 7 con la informacion de los  pixeles
@@ -121,7 +118,22 @@ flipV_AuxRGB(Alto,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad1]
     Profundidad1 is Profundidad,
     flipV_AuxRGB(Alto, Cola, ColaResultado).
 
- /*-------------------------------------PREDICADO ------------------------------------------------------*/
+/*-------------------------------------PREDICADO FLIPH_AUXRGB------------------------------------------------------*/
+% Dominio: dato tipo int que corresponde al alto y una lista de tamaño 7 con la informacion de los  pixeles
+
+% Descripcion: Función auxiliar que permite invertir una imagen horizotalmente,cuando la imagen corresponde a un pixmap.
+% Tipo de Meta: Secundaria.
+
+flipH_AuxRGB(_,[], []).
+flipH_AuxRGB(Alto,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad1]|ColaResultado]):-
+  	X1 is (Alto - 1) - X ,
+    Y1 is Y, 
+    R1 is R,
+    G1 is G,
+    B1 is B,
+    Profundidad1 is Profundidad,
+    flipH_AuxRGB(Alto, Cola, ColaResultado).
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:   
     
@@ -157,13 +169,13 @@ agregar_salto([Cabeza|Cola],Alto,[Cabeza|ColaResultado],Contador):-
 agregar_tab([],[]) .      
 agregar_tab([Cabeza|Cola],[Cabeza,"\t"|ColaResultado]):- 
     agregar_tab(Cola,ColaResultado).
+
 /*-------------------------------------PREDICADO ORDENAR-SEGUN-X ------------------------------------------------------*/
 % Dominio: Lista de pixeles
 % Descripcion: Ordena los pixeles de menor a mayor utilizando la posicion x.
 
 ordenar_segun_x(Lista_pixeles, Pixeles_ordenados):-
     sort(1, @=<, Lista_pixeles, Pixeles_ordenados).
-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -192,7 +204,6 @@ pixeles_primera_posicion_rgb([],[]).
 pixeles_primera_posicion_rgb([[_,_,R,G,B,Profundidad]|Cola], [[0,0,R,G,B,Profundidad]|Cabeza]):-
     pixeles_primera_posicion_rgb(Cola,Cabeza).
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -201,8 +212,6 @@ agregar_profundidad_rgb([],_,[]).
 agregar_profundidad_rgb([[X, Y, R,G,B,_]|Cola],Profundidad,[[X, Y, R,G,B,Profundidad]|ColaResultado]) :- 
     agregar_profundidad_rgb(Cola,Profundidad,ColaResultado).
  
-
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -211,7 +220,6 @@ insertar_pixeles_blancos_rgb([],_,[]) .
 insertar_pixeles_blancos_rgb([[X,Y,R,G,B,Profundidad]|Cola],PixelesBlancos,[[[X,Y,R,G,B,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
     agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
     insertar_pixeles_blancos_rgb(Cola,PixelesBlancos,ColaResultado).
- 
  
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
@@ -253,7 +261,7 @@ separar_capas_rgb(Lista, Lista2):-
 impar(N):- 
     mod(N,2) =:= 0.
 
-    /*-------------------------------------PREDICADO PROFUNDIDAD------------------------------------------------------*/
+/*-------------------------------------PREDICADO PROFUNDIDAD------------------------------------------------------*/
 % Dominio:Lista de pixeles
 % Descripcion: Ordena los pixeles de menor a mayor segun la profundidad del pixel.
  
@@ -285,7 +293,7 @@ agrupar([ListaPixel,ListaPixel1|Cola],PixelesConDistintaProfundidad,[PixelesConD
     append([ListaPixel],PixelesConDistintaProfundidad,PixelesConDistintaProfundidad1) ,
  	agrupar([ListaPixel1|Cola],[],ColaResultado).
 
-    /*-------------------------------------PREDICADO INVERTIR------------------------------------------------------*/
+/*-------------------------------------PREDICADO INVERTIR------------------------------------------------------*/
 % Dominio: Lista de pixeles.
 % Descripcion: Invierte el orden de los pixeles, dejando la profundidad al principio.
  
@@ -294,11 +302,12 @@ invertir([Cabeza| Cola], [CabezaInvertida|ColaResultado]):-
     reverse(Cabeza,CabezaInvertida),
     invertir(Cola,ColaResultado).
     
-    /*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
+/*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
 % Dominio:Lista de pixeles.
 % Descripcion:Elimina el primer pixel de una lista de pixeles.
  
 quitar_primer_pixel([_|Tail], Tail).
+
 /*--------------------------------SEGUNDA PARTE DEL ARCHIVO------------------------------------------------*/
 
 /*              AQUI SE ENCUENTRAN LOS PREDICADOS REQUERIDOS EN EL LABORATORIO                             */
@@ -316,7 +325,6 @@ imageIsPixmap([_,_, [[_,_,R,G,B,_]|_]]) :-
     writeln('#t');
     writeln('#f').
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:  
@@ -324,11 +332,3 @@ imageInvertColorRGB([X,Y,R,G,B,Profundidad],[X,Y,R2,G2,B2,Profundidad]):-
     R2 is 255- R,
     G2 is 255- G,
     B2 is 255- B.
-
-
-
-
-
-
-
-

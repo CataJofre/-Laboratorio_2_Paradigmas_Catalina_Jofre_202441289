@@ -1,10 +1,18 @@
-:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2,imageCompress/2 ]).
+:- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2,imageCompress/3,imageChangePixel/3,imageToString/2,
+                                        imageDepthLayers/2,imageDecompress/3 ]).
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
 :- use_module(tda_pixrgb_20244128_JofreLeon).
-/*-----------------------------------------------------TDA IMAGE-------------------------------------------*/
-% Este archivo corresponde al tda image, se encuentran todas los predicados necesarios para su creacion, 
-% tambien los predicados organizados segun estructura.
+
+
+/*-----------------------------------------------------TDA IMAGE-------------------------------------------
+Este archivo corresponde al TDA image, se encuentran todos los predicados necesarios para su creacion y tambien
+los solicitados en el proyecto de laboratorio.
+Por motivos de organizacion se realizo la division del archivo en dos partes principales, la primera corresponde
+a aquellos predicados cuyas metas son secundarias por lo que aportan en el funcionamiento de los predicados solicitados
+y la segunda donde se encuentran todos los predicados del laboratorio
+
+PRIMERA PARTE:  PREDICADOS AUXILIARES O PREDICADOS CON FUNCIONES ESPECIFICAS                    */
 
 /*-----------------------------------------------------REPRESENTACION--------------------------------------*/
 
@@ -13,26 +21,10 @@
 % posibilidad de reproducir diferentes aspectos de lo que es una imagen, usando los colores y la profundidad.
 
 % Es una lista que contiene el alto ancho y una lista con la cantidad correspondiente de pixeles
-/*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
-/*-------------------------------------PREDICADO IMAGE ------------------------------------------------------*/
-% Dominio: datos de tipo int y una lista
-% Recorrido:una lista con la informacion
-% Descripcion: Constructor del tda image que toma un alto, ancho y una lista con pixeles
-
-image(Ancho, Alto, Lista_pixeles, [Ancho, Alto, Lista_pixeles] ):-
-    integer(Ancho), integer(Alto),
-    Ancho >= 1, Alto >= 1.
-
-/*-----------------------------------------------------PREDICADOS DE PERTENENCIA---------------------------*/
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
 
 /*-----------------------------------------------------SELECTORES------------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 seleccionar_pixeles([Cabeza|_],1,1,[Cabeza]).
@@ -43,11 +35,10 @@ seleccionar_pixeles([Cabeza|Cola],1,Fin,[Cabeza|ColaResultado]) :-
 seleccionar_pixeles([_|Cola],Inicio,Fin,ColaResultado) :- 
 	Inicio > 1, 
     Inicio1 is Inicio - 1, Fin1 is Fin - 1, 
-  seleccionar_pixeles(Cola,Inicio1,Fin1,ColaResultado).
+    seleccionar_pixeles(Cola,Inicio1,Fin1,ColaResultado).
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 color_frecuente([], _, []).
 color_frecuente([[_,_, ColorPixel,_]|Cola], ColorFrecuente, Resultado):- 
@@ -58,7 +49,6 @@ color_frecuente([[X, Y, ColorPixel, Profundidad]|Cola], ColorFrecuente, [[X, Y, 
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 resto_de_colores([], _, []).
@@ -68,36 +58,8 @@ resto_de_colores([[_,_, ColorPixel,_]|Cola], ColorFrecuente, Resultado):-
 resto_de_colores([[X, Y, ColorPixel, Profundidad]|Cola], ColorFrecuente, [[X, Y, ColorPixel, Profundidad]|Resultado]):- 
     resto_de_colores(Cola, ColorFrecuente, Resultado).
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
-% Descripcion:
-
-color_frecuente_rgb([], _, _,_,[]).
-color_frecuente_rgb([[_,_,R,G,B,_]|Cola], R_frecuente, G_frecuente, B_frecuente, Resultado):- 
- R \=  R_frecuente, G \=  G_frecuente, B \=  B_frecuente  ->   
-    color_frecuente_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado). 
-color_frecuente_rgb([[X, Y, R,G,B, Profundidad]|Cola], R_frecuente, G_frecuente, B_frecuente, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
-    color_frecuente_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado).
-
-
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
-
-resto_de_colores_rgb([], _,_,_, []).
-resto_de_colores_rgb([[_,_,R,G,B,_]|Cola], R_frecuente, G_frecuente, B_frecuente, Resultado):- 
-   R ==  R_frecuente, G ==  G_frecuente, B ==  B_frecuente  ->   
-   resto_de_colores_rgb(Cola,R_frecuente, G_frecuente, B_frecuente, Resultado). 
-resto_de_colores_rgb([[X, Y, R,G,B, Profundidad]|Cola], R_frecuente, G_frecuente, B_frecuente, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
-    resto_de_colores_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado).
-
-
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
 % Descripcion:
 
 colores(Lista, Color, ColorFrecuente,RestoDeColores):-
@@ -110,9 +72,7 @@ colores_rgb(Lista, R,G,B, ColorFrecuente,RestoDeColores):-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
-
 
 color_histograma( [[Color,_]|_], Color).
 color_histograma_rgb( [[[R,G,B],_]|_], R,G,B).
@@ -120,25 +80,6 @@ color_histograma_rgb( [[[R,G,B],_]|_], R,G,B).
 /*-----------------------------------------------------MODIFICADORES---------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
-% Descripcion:
-
-
-
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
-
-eliminar_pixel_rgb([], _, _,[]).
-eliminar_pixel_rgb([[X,Y,_,_,_,_]|Cola], X2,Y2, Resultado):- 
-   X == X2, Y == Y2 ->   
-   eliminar_pixel_rgb(Cola,X2,Y2, Resultado). 
-eliminar_pixel_rgb([[X,Y,R,G,B, Profundidad]|Cola], X2,Y2, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
-    eliminar_pixel_rgb(Cola, X2,Y2, Resultado).
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
 % Descripcion:
 
 eliminar_pixel([], _, _,[]).
@@ -150,16 +91,6 @@ eliminar_pixel([[X,Y,Color, Profundidad]|Cola], X2,Y2, [[X, Y, Color, Profundida
     
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
-% Descripcion:
-
-agregar_pixel_rgb(ListaPixeles, [X,Y,R,G,B, Profundidad], Image2):-
-    eliminar_pixel_rgb(ListaPixeles, X,Y, Resultado),
-    append(Resultado, [[X,Y,R,G,B, Profundidad]], Imag),
-    ordenar_segun_x(Imag,Image2).
-    /*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
 % Descripcion:
 
 agregar_pixel(ListaPixeles, [X,Y,Color, Profundidad], Image2):-
@@ -170,23 +101,20 @@ agregar_pixel(ListaPixeles, [X,Y,Color, Profundidad], Image2):-
 /*-----------------------------------------------------OTROS PREDICADOS------------------------------------*/
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 ordenar_segun_y(Lista_pixeles, Pixeles_ordenados):-
     sort(2, @=<, Lista_pixeles, Pixeles_ordenados).
 
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*-------------------------------------PREDICADO ORDENAR-SEGUN-X ------------------------------------------------------*/
+% Dominio: Lista de pixeles
+% Descripcion: Ordena los pixeles de menor a mayor utilizando la posicion x.
 
 ordenar_segun_x(Lista_pixeles, Pixeles_ordenados):-
     sort(1, @=<, Lista_pixeles, Pixeles_ordenados).
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 ordenar_lista(Lista, ListaOrdenada):-
@@ -194,7 +122,6 @@ ordenar_lista(Lista, ListaOrdenada):-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 largo_lista([],0).
@@ -204,7 +131,6 @@ largo_lista([_|Cola],Contador) :-
 
 /*-------------------------------------PREDICADO FLIPH_AUX------------------------------------------------------*/
 % Dominio: dato tipo int que corresponde al ancho y una lista de tamaño 4 con la informacion de los  pixeles
-% Recorrido: lista con los pixeles ya modificados 
 % Descripcion: Función auxiliar que permite invertir una imagen horizontalmente,cuando la imagen corresponde a un bitmap o hexmap.
 % Tipo de Meta: Secundaria.
 
@@ -215,25 +141,10 @@ flipH_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|Col
     Color1 is Color,
     Profundidad1 is Profundidad,
     flipH_Aux(Ancho, Cola, ColaResultado).
-    /*-------------------------------------PREDICADO FLIPH_AUXRGB------------------------------------------------------*/
-% Dominio: dato tipo int que corresponde al alto y una lista de tamaño 7 con la informacion de los  pixeles
-% Recorrido: lista con los pixeles ya modificados 
-% Descripcion: Función auxiliar que permite invertir una imagen horizontalmente,cuando la imagen corresponde a un pixmap.
-% Tipo de Meta: Secundaria.
 
-flipH_AuxRGB(_,[], []).
-flipH_AuxRGB(Ancho,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad1]|ColaResultado]):-
-  	X1 is (Ancho - 1) - X ,
-    Y1 is Y, 
-    R1 is R,
-    G1 is G,
-    B1 is B,
-    Profundidad1 is Profundidad,
-    flipH_AuxRGB(Ancho, Cola, ColaResultado).
 
 /*-------------------------------------PREDICADO FLIPV_AUX------------------------------------------------------*/
 % Dominio: dato tipo int que corresponde al alto y una lista de tamaño 4 con la informacion de los  pixeles
-% Recorrido: lista con los pixeles ya modificados 
 % Descripcion: Función auxiliar que permite invertir una imagen verticalmente,cuando la imagen corresponde a un bitmap o hexmap.
 % Tipo de Meta: Secundaria.
 
@@ -245,24 +156,8 @@ flipV_Aux(Alto,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|Cola
     Profundidad1 is Profundidad,
     flipV_Aux(Alto, Cola, ColaResultado).
 
-/*-------------------------------------PREDICADO FLIPV_AUXRGB------------------------------------------------------*/
-% Dominio: dato tipo int que corresponde al alto y una lista de tamaño 7 con la informacion de los  pixeles
-% Recorrido: lista con los pixeles ya modificados 
-% Descripcion: Función auxiliar que permite invertir una imagen verticalmente,cuando la imagen corresponde a un pixmap.
-% Tipo de Meta: Secundaria.
-
-flipV_AuxRGB(_,[], []).
-flipV_AuxRGB(Alto,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad1]|ColaResultado]):-
-  	X1 is X ,
-    Y1 is (Alto - 1) - Y, 
-    R1 is R,
-    G1 is G,
-    B1 is B,
-    Profundidad1 is Profundidad,
-    flipV_AuxRGB(Alto, Cola, ColaResultado).
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 crop(ListaPixeles, Xa,Ya, Xb,Yb, PixelesSeleccionados ):-
@@ -273,7 +168,6 @@ crop(ListaPixeles, Xa,Ya, Xb,Yb, PixelesSeleccionados ):-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados ):-
@@ -292,7 +186,6 @@ cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados ):-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 contar(Elemento,[],[],1,[Elemento,1]).
@@ -308,7 +201,6 @@ contar(Elemento,[Elemento|Cola],ListaResultante,Contador,Resultado) :-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
 contar_elemento([],[]).
@@ -318,8 +210,8 @@ contar_elemento([Elemento|Cola],[ElementoSalida|ColaResultado]) :-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
+
 rotate_Aux(_,[], []).
 rotate_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|ColaResultado]):-
   	X1 is (Ancho - 1) - Y ,
@@ -328,41 +220,17 @@ rotate_Aux(Ancho,[[X,Y,Color,Profundidad]|Cola], [[X1,Y1,Color1,Profundidad1]|Co
     Profundidad1 is Profundidad,
    rotate_Aux(Ancho, Cola, ColaResultado).
 
- /*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:   
-    
-rotate_AuxRGB(_,[], []).
-rotate_AuxRGB(Ancho,[[X,Y,R,G,B,Profundidad]|Cola], [[X1,Y1,R1,G1,B1,Profundidad1]|ColaResultado]):-
-  	X1 is (Ancho - 1) - Y ,
-    Y1 is X, 
-    R1 is R,
-    G1 is G,
-    B1 is B,
-    Profundidad1 is Profundidad,
-    rotate_AuxRGB(Ancho, Cola, ColaResultado).   
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
-
-
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*-------------------------------------PREDICADO IMPAR------------------------------------------------------*/
+% Dominio: Entero, Alto de la imagen
+% Recorrido: Boolean
+% Descripcion: Ve si el valor del alto de la imagen corresponde a un numero impar o no.
 
 impar(N):- 
     mod(N,2) =:= 0.
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
+/*-------------------------------------PREDICADO AGREGAR-SALTO------------------------------------------------------*/
+% Dominio: Lista de pixeles
+% Descripcion: Inserta el simbolo de salto de linea, luego de una cantidad X de elementos, (X corresponde al alto de la imagen), para que cuando se lea hayan saltos entre los elementos
+
 agregar_salto(Lista,Alto,ListaConSalto):-
     agregar_salto(Lista,Alto,ListaConSalto,Alto).
 agregar_salto([],_,[],_).
@@ -373,70 +241,98 @@ agregar_salto([Cabeza|Cola],Alto,[Cabeza|ColaResultado],Contador):-
     Contador1 is Contador - 1, 
     agregar_salto(Cola,Alto,ColaResultado,Contador1).
 
+/*-------------------------------------PREDICADO AGREGAR-TAB------------------------------------------------------*/
+% Dominio:Lista de pixeles
+% Descripcion: Inserta el simbolo tab luego de cada elemento de la lista, para que cuando se lea haya un espacio entre estos
 
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
 agregar_tab([],[]) .      
 agregar_tab([Cabeza|Cola],[Cabeza,"\t"|ColaResultado]):- 
     agregar_tab(Cola,ColaResultado).
 
+/*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
+% Dominio:Lista de pixeles.
+% Descripcion:Elimina el primer pixel de una lista de pixeles.
+ 
+quitar_primer_pixel([_|Tail], Tail).
+  
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
-pixeles_a_string_hex(ListaPixeles, Alto, ListaString):-
-    impar(Alto) ->  
-    	seleccionar_hex(ListaPixeles, Pixeles),
-    	agregar_tab(Pixeles, PixTab),
-    	agregar_salto(PixTab, (Alto+1), PixSalto),
-    	flatten(PixSalto, PixLista),
-    	atomics_to_string(PixLista, ListaString);
-    seleccionar_hex(ListaPixeles, Pixeles),
-    agregar_tab(Pixeles, PixTab),
-    agregar_salto(PixTab, Alto, PixSalto),
-    flatten(PixSalto, PixLista),
-    atomics_to_string(PixLista, ListaString).
+ 
+insertarAnchoAlto(_,_,[],[]).
+insertarAnchoAlto(Ancho,Alto,[Pixeles|Cola], [[Ancho,Alto, Pixeles]|ColaResultado]):-
+    insertarAnchoAlto(Ancho,Alto,Cola,ColaResultado).
+ 
+/*-------------------------------------PREDICADO INVERTIR------------------------------------------------------*/
+% Dominio: Lista de pixeles.
+% Descripcion: Invierte el orden de los pixeles, dejando la profundidad al principio.
+ 
+invertir([],[]).
+invertir([Cabeza| Cola], [CabezaInvertida|ColaResultado]):-   
+    reverse(Cabeza,CabezaInvertida),
+    invertir(Cola,ColaResultado).
+ 
+/*-------------------------------------PREDICADO PROFUNDIDAD------------------------------------------------------*/
+% Dominio:Lista de pixeles
+% Descripcion: Ordena los pixeles de menor a mayor segun la profundidad del pixel.
+ 
+ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados):-
+    invertir(ListaPixeles,ListaPixelesInvertidos),
+	sort(0, @=<, ListaPixelesInvertidos, ListaPixelesOrdenadosInvertidos),
+	invertir(ListaPixelesOrdenadosInvertidos,ListaPixelesOrdenados).
+ 
+/*-------------------------------------PREDICADO AGRUPAR-POR-PROFUNDIDAD------------------------------------------------------*/
+% Dominio: Lista de pixeles.
+% Descripcion: Agrupa los pixeles que tienen la misma profundidad.
+ 
+agrupar_por_profundidad(ListaPixles,ListaAgrupada):-
+    agrupar(ListaPixles,[],ListaAgrupada).
+ 
+agrupar([],[],[]).
+agrupar([ListaPixel],ListaPixeles,[PixelesConMismaProfundidad]):- 
+    append([ListaPixel],ListaPixeles,PixelesConMismaProfundidad).
+agrupar([ListaPixel,ListaPixel1|Cola],PixelesConMismaProfundidad,PixelesConMismaProfundidadLista):- 
+    last(ListaPixel,Profundidad),  
+    last(ListaPixel1,Profundidad1),
+    Profundidad== Profundidad1 , 
+    append([ListaPixel],PixelesConMismaProfundidad,PixelesConMismaProfundidad1) , 
+   	agrupar([ListaPixel1|Cola],PixelesConMismaProfundidad1,PixelesConMismaProfundidadLista).
+agrupar([ListaPixel,ListaPixel1|Cola],PixelesConDistintaProfundidad,[PixelesConDistintaProfundidad1|ColaResultado]):- 
+    last(ListaPixel,Profundidad),  
+    last(ListaPixel1,Profundidad1),
+    Profundidad\=Profundidad1 ,
+    append([ListaPixel],PixelesConDistintaProfundidad,PixelesConDistintaProfundidad1) ,
+ 	agrupar([ListaPixel1|Cola],[],ColaResultado).
+	
+/*--------------------------------SEGUNDA PARTE DEL ARCHIVO------------------------------------------------*/
+
+/*              AQUI SE ENCUENTRAN LOS PREDICADOS REQUERIDOS EN EL LABORATORIO                             */
+
+/* --------------------------------------------------------------------------------------------------------*/
+
     
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:
-pixeles_a_string_bit(ListaPixeles, Alto, ListaString):-
-    impar(Alto) ->  
-    	seleccionar_bit(ListaPixeles, Pixeles),
-   		agregar_tab(Pixeles, PixTab),
-    	agregar_salto(PixTab, (Alto + 1) , PixSalto),
-    	flatten(PixSalto, PixLista),
-    	atomics_to_string(PixLista, ListaString);
-    seleccionar_bit(ListaPixeles, Pixeles),
-   	agregar_tab(Pixeles, PixTab),
-    agregar_salto(PixTab, Alto , PixSalto),
-    flatten(PixSalto, PixLista),
-    atomics_to_string(PixLista, ListaString).
+/*-----------------------------------------------------CONSTRUCTORES----------------------------------------*/
+/*-------------------------------------PREDICADO IMAGE ------------------------------------------------------*/
+% Dominio: datos de tipo int y una lista
+% Descripcion: Constructor del tda image que toma un alto, ancho y una lista con pixeles
 
+image(Ancho, Alto, Lista_pixeles, [Ancho, Alto, Lista_pixeles] ):-
+    integer(Ancho), integer(Alto),
+    Ancho >= 1, Alto >= 1.
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
-pixeles_a_string_rgb(ListaPixeles, Alto, ListaString):-
-    impar(Alto) ->  
-    	seleccionar_rgb(ListaPixeles, Pixeles),
-    	agregar_tab(Pixeles, PixTab),
-   		agregar_salto(PixTab, (Alto+1), PixSalto),
-    	flatten(PixSalto, PixLista),
-    	atomics_to_string(PixLista, ListaString);
-    seleccionar_rgb(ListaPixeles, Pixeles),
-    agregar_tab(Pixeles, PixTab),
-    agregar_salto(PixTab, Alto, PixSalto),
-    flatten(PixSalto, PixLista),
-    atomics_to_string(PixLista, ListaString).
+
+imageIsCompressed(Image):-
+    image(Alto,Ancho, ListaPixeles,Image),
+    Total is Alto * Ancho,
+    largo_lista(ListaPixeles, Largo),
+    Total == Largo ->  writeln('#f');
+    writeln('#t').
 
 /*-------------------------------------PREDICADO FLIPH------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
-% Recorrido:Imagen (lista con el ancho, alto y los pixeles) pero modificada.
 % Descripcion:  Función que permite invertir una imagen horizontalmente, cambiando el valor de la posicion de x, y dejando sin alterar la posicion de y. 
 % Tipo de Meta: Primaria
 
@@ -447,10 +343,8 @@ imageFlipH(Image, I):-
     % sino se llama a laPREDICADO flipH_Aux
     image(Ancho, Alto, PixelsIn, Image), flipH_Aux(Ancho,PixelsIn, PixelsOut), image(Ancho, Alto, PixelsOut, I).
 
-
 /*------------------------------------- PREDICADO FLIPV------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
-% Recorrido:Imagen (lista con el ancho, alto y los pixeles) pero modificada.
 % Descripcion:  Función que permite invertir una imagen verticalmente, cambiando el valor de la posicion de y, y dejando sin alterar la posicion de x. 
 % Tipo de Meta: Primaria
 
@@ -463,7 +357,7 @@ imageFlipV(Image, I):-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
+
 % Descripcion:
 
 imageCrop(Image,X1,Y1, X2,Y2, Image2):-
@@ -471,24 +365,18 @@ imageCrop(Image,X1,Y1, X2,Y2, Image2):-
     cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados),
     image(Ancho,Alto, PixelesSeleccionados, Image2).
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
-
 
 imageRGBToHex(Image, Image2):-
     image(Ancho,Alto, ListaPixeles, Image),
   	rgb_hex(ListaPixeles, PixelesAHex),
     image(Ancho,Alto, PixelesAHex, Image2).
-    
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
-
 
 imageToHistogram(Image, Histograma):-
     imageIsHexmap(Image)->  
@@ -509,9 +397,7 @@ imageToHistogram(Image, Histograma):-
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
-
 
 imageRotate90(Image, I):-
     % si la imagen es de tipo hexmap se llama al predicado auxiliar rotate_AuxRGB
@@ -526,41 +412,25 @@ imageRotate90(Image, I):-
    	ordenar_segun_x(PixelsOut,PixelsOutOrdenado),
     image(Ancho, Alto, PixelsOutOrdenado, I).
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
 
-
-imageCompress(Image, ImageComprimida):-
+imageCompress(Image, ImageComprimida,Z):-
     imageIsPixmap(Image)->  
     	image(Alto,Ancho, ListaPixeles, Image),
     	imageToHistogram(Image, Histograma),
     	color_histograma_rgb( Histograma, R,G,B),
-    	colores_rgb(ListaPixeles,R,G,B, _,PixelesComprimidos),
+    	colores_rgb(ListaPixeles,R,G,B, Z,PixelesComprimidos),
     	image(Alto,Ancho, PixelesComprimidos, ImageComprimida);
     image(Alto,Ancho, ListaPixeles, Image),
     imageToHistogram(Image, Histograma),
     color_histograma( Histograma, Color),
-    colores(ListaPixeles,Color,_,PixelesComprimidos),
+    colores(ListaPixeles,Color,Z,PixelesComprimidos),
     image(Alto,Ancho, PixelesComprimidos, ImageComprimida).
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
-% Descripcion:
-
-imageIsCompressed(Image):-
-    image(Alto,Ancho, ListaPixeles,Image),
-    Total is Alto * Ancho,
-    largo_lista(ListaPixeles, Largo),
-    Total == Largo ->  writeln('#f');
-    writeln('#t').
-
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
 % Descripcion:
 
 imageChangePixel(Image, Pixel, ImagenModificada):-
@@ -572,19 +442,9 @@ imageChangePixel(Image, Pixel, ImagenModificada):-
     image(Alto,Ancho, ListaPixeles, Image),
     agregar_pixel(ListaPixeles, Pixel, ListaNueva),
     image(Alto,Ancho, ListaNueva, ImagenModificada).
-    
-/*-------------------------------------PREDICADO ------------------------------------------------------*/
-% Dominio:
-% Recorrido:
-% Descripcion:  
-    invertColorRGB([X,Y,R,G,B,Profundidad],[X,Y,R2,G2,B2,Profundidad]):-
-    R2 is 255- R,
-    G2 is 255- G,
-    B2 is 255- B.
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
-% Recorrido:
 % Descripcion:
  imageToString(Image, ImageEnString):-
     imageIsPixmap(Image)->  
@@ -597,224 +457,44 @@ imageChangePixel(Image, Pixel, ImagenModificada):-
     	image(_,Alto,ListaPixeles,Image),
     	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString).
 
-
-
-
-quitar_primer_pixel([_|Tail], Tail).
-
-seleccionar_profundidad_hex(ListaProfundidad, ListaSinDulplicas):-
-    seleccionar_profundidad_hex_1(ListaProfundidad,Lista),
-    sort(Lista, ListaSinDulplicas).
-seleccionar_profundidad_hex_1([],[]).    
-seleccionar_profundidad_hex_1([[_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
-  	seleccionar_profundidad_hex_1(Cola,ColaResultado).
-
-
-seleccionar_profundidad_bit(ListaProfundidad, ListaSinDulplicas):-
-    seleccionar_profundidad_bit_1(ListaProfundidad,Lista),
-    sort(Lista, ListaSinDulplicas).
-seleccionar_profundidad_bit_1([],[]).    
-seleccionar_profundidad_bit_1([[_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
-  	seleccionar_profundidad_bit_1(Cola,ColaResultado).
-
-
-seleccionar_profundidad_rgb(ListaProfundidad, ListaSinDulplicas):-
-    seleccionar_profundidad_rgb_1(ListaProfundidad,Lista),
-    sort(Lista, ListaSinDulplicas).
-seleccionar_profundidad_rgb_1([],[]).    
-seleccionar_profundidad_rgb_1([[_,_,_,_,_,Profundidad]|Cola],[Profundidad|ColaResultado]):-
-  	seleccionar_profundidad_rgb_1(Cola,ColaResultado).
-
-pixeles_en_blanco_bit([],[]).
-pixeles_en_blanco_bit([[X,Y,_,_]|Cola], [[X,Y,1,0]|Cabeza]):-
-    pixeles_en_blanco_bit(Cola,Cabeza).
-
-pixeles_en_blanco_hex([],[]).
-pixeles_en_blanco_hex([[X,Y,_,_]|Cola], [[X,Y,"#FFFFFF",0]|Cabeza]):-
-    pixeles_en_blanco_hex(Cola,Cabeza).
-
-pixeles_en_blanco_rgb([],[]).
-pixeles_en_blanco_rgb([[X,Y,_,_,_,_]|Cola], [[X,Y,255,255,255,0]|Cabeza]):-
-    pixeles_en_blanco_rgb(Cola,Cabeza).
-
-
-pixeles_primera_posicion_rgb([],[]).
-pixeles_primera_posicion_rgb([[_,_,R,G,B,Profundidad]|Cola], [[0,0,R,G,B,Profundidad]|Cabeza]):-
- pixeles_primera_posicion_rgb(Cola,Cabeza).
-
-pixeles_primera_posicion_hex([],[]).
-pixeles_primera_posicion_hex([[_,_,Hex,Profundidad]|Cola], [[0,0,Hex,Profundidad]|Cabeza]):-
- pixeles_primera_posicion_hex(Cola,Cabeza).
-
-pixeles_primera_posicion_bit([],[]).
-pixeles_primera_posicion_bit([[_,_,Bit,Profundidad]|Cola], [[0,0,Bit,Profundidad]|Cabeza]):-
- pixeles_primera_posicion_bit(Cola,Cabeza).
-
-
-
-agregar_profundidad_rgb([],_,[]).      
-agregar_profundidad_rgb([[X, Y, R,G,B,_]|Cola],Profundidad,[[X, Y, R,G,B,Profundidad]|ColaResultado]) :- 
-      agregar_profundidad_rgb(Cola,Profundidad,ColaResultado).
-
-agregar_profundidad_hex([],_,[]).      
-agregar_profundidad_hex([[X, Y, Hex,_]|Cola],Profundidad,[[X, Y, Hex,Profundidad]|ColaResultado]) :- 
-      agregar_profundidad_hex(Cola,Profundidad,ColaResultado).
-
-agregar_profundidad_bit([],_,[]).      
-agregar_profundidad_bit([[X, Y,Bit ,_]|Cola],Profundidad,[[X, Y, Bit,Profundidad]|ColaResultado]) :- 
-      agregar_profundidad_bit(Cola,Profundidad,ColaResultado).
-
-
-insertar_pixeles_blancos_rgb([],_,[]) .      
-insertar_pixeles_blancos_rgb([[X,Y,R,G,B,Profundidad]|Cola],PixelesBlancos,[[[X,Y,R,G,B,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
-    agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
-    insertar_pixeles_blancos_rgb(Cola,PixelesBlancos,ColaResultado).
-
-insertar_pixeles_blancos_hex([],_,[]) .      
-insertar_pixeles_blancos_hex([[X,Y,Hex ,Profundidad]|Cola],PixelesBlancos,[[[X,Y,Hex ,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
-    agregar_profundidad_hex(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
-    insertar_pixeles_blancos_hex(Cola,PixelesBlancos,ColaResultado).
-
-insertar_pixeles_blancos_bit([],_,[]) .      
-insertar_pixeles_blancos_bit([[X,Y,Bit ,Profundidad]|Cola],PixelesBlancos,[[[X,Y,Bit ,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
-    agregar_profundidad_bit(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
-    insertar_pixeles_blancos_bit(Cola,PixelesBlancos,ColaResultado).
-
-insertar_pixeles_blancos_profundidad_repetida_rgb( [],_,[]) .      
-insertar_pixeles_blancos_profundidad_repetida_rgb( [[[X,Y,R,G,B,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado] ) :- 
-    agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesConProfundidad),
-    append([[X,Y,R,G,B,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
-   insertar_pixeles_blancos_profundidad_repetida_rgb(Cola,PixelesBlancos,ColaResultado).
-
-insertar_pixeles_blancos_profundidad_repetida_hex( [],_,[]) .      
-insertar_pixeles_blancos_profundidad_repetida_hex( [[[X,Y,Hex ,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado] ) :- 
-    agregar_profundidad_hex(PixelesBlancos,Profundidad,PixelesConProfundidad),
-    append([[X,Y, Hex,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
-   insertar_pixeles_blancos_profundidad_repetida_hex(Cola,PixelesBlancos,ColaResultado).
-
-insertar_pixeles_blancos_profundidad_repetida_bit( [],_,[]) .      
-insertar_pixeles_blancos_profundidad_repetida_bit( [[[X,Y,Bit ,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado] ) :- 
-    agregar_profundidad_bit(PixelesBlancos,Profundidad,PixelesConProfundidad),
-    append([[X,Y,Bit,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
-   insertar_pixeles_blancos_profundidad_repetida_bit(Cola,PixelesBlancos,ColaResultado).
-
-
-
-
-
-
-insertarAnchoAlto(_,_,[],[]).
-insertarAnchoAlto(Ancho,Alto,[Pixeles|Cola], [[Ancho,Alto, Pixeles]|ColaResultado]):-
-    insertarAnchoAlto(Ancho,Alto,Cola,ColaResultado).
-
-invertir([],[]).
-invertir([Cabeza| Cola], [CabezaInvertida|ColaResultado]):-   
-    reverse(Cabeza,CabezaInvertida),
-    invertir(Cola,ColaResultado).
-
-ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados):-
-    invertir(ListaPixeles,ListaPixelesInvertidos),
-	sort(0, @=<, ListaPixelesInvertidos, ListaPixelesOrdenadosInvertidos),
-	invertir(ListaPixelesOrdenadosInvertidos,ListaPixelesOrdenados).
-
-agrupar_por_profundidad(ListaPixles,ListaAgrupada):-
-    agrupar(ListaPixles,[],ListaAgrupada).
-
-agrupar([],[],[]).
-agrupar([ListaPixel],ListaPixeles,[PixelesConMismaProfundidad]):- 
-    append([ListaPixel],ListaPixeles,PixelesConMismaProfundidad).
-
-agrupar([ListaPixel,ListaPixel1|Cola],PixelesConMismaProfundidad,PixelesConMismaProfundidadLista):- 
-    last(ListaPixel,Profundidad),  
-    last(ListaPixel1,Profundidad1),
-    Profundidad== Profundidad1 , 
-    append([ListaPixel],PixelesConMismaProfundidad,PixelesConMismaProfundidad1) , 
-   	agrupar([ListaPixel1|Cola],PixelesConMismaProfundidad1,PixelesConMismaProfundidadLista).
-
-agrupar([ListaPixel,ListaPixel1|Cola],PixelesConDistintaProfundidad,[PixelesConDistintaProfundidad1|ColaResultado]):- 
-    last(ListaPixel,Profundidad),  
-    last(ListaPixel1,Profundidad1),
-    Profundidad\=Profundidad1 ,
-    append([ListaPixel],PixelesConDistintaProfundidad,PixelesConDistintaProfundidad1) ,
- 	agrupar([ListaPixel1|Cola],[],ColaResultado).
-
-	
-
-
-separar_capas_repeticion_profundidades_rgb(ListaPixeles,ListaPixelesSeparados):-
-     ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados),
-    agrupar_por_profundidad(ListaPixelesOrdenados,ListaPixelesAgrupados),
-	pixeles_en_blanco_rgb(ListaPixeles,ListaPixelesBlancos),
-	quitar_primer_pixel(ListaPixelesBlancos,ListaPixelesBlancos2),
-	insertar_pixeles_blancos_profundidad_repetida_rgb(ListaPixelesAgrupados,ListaPixelesBlancos2,ListaPixelesSeparados),!.
-
-separar_capas_rgb(Lista, Lista2):-
-    pixeles_primera_posicion_rgb(Lista,T),
-    pixeles_en_blanco_rgb(Lista,R),
-    quitar_primer_pixel(R,R2),
-    insertar_pixeles_blancos_rgb(T,R2,Lista2),!.
-    
- 
-
-separar_capas_repeticion_profundidades_hex(ListaPixeles,ListaPixelesSeparados):-
-     ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados),
-    agrupar_por_profundidad(ListaPixelesOrdenados,ListaPixelesAgrupados),
-	pixeles_en_blanco_hex(ListaPixeles,ListaPixelesBlancos),
-	quitar_primer_pixel(ListaPixelesBlancos,ListaPixelesBlancos2),
-	insertar_pixeles_blancos_profundidad_repetida_hex(ListaPixelesAgrupados,ListaPixelesBlancos2,ListaPixelesSeparados),!.
-
-separar_capas_hex(Lista, Lista2):-
-    pixeles_primera_posicion_hex(Lista,T),
-    pixeles_en_blanco_hex(Lista,R),
-    quitar_primer_pixel(R,R2),
-    insertar_pixeles_blancos_hex(T,R2,Lista2),!.
-
-
-separar_capas_repeticion_profundidades_bit(ListaPixeles,ListaPixelesSeparados):-
-    ordenar_profundidad(ListaPixeles,ListaPixelesOrdenados),
-    agrupar_por_profundidad(ListaPixelesOrdenados,ListaPixelesAgrupados),
-	pixeles_en_blanco_bit(ListaPixeles,ListaPixelesBlancos),
-	quitar_primer_pixel(ListaPixelesBlancos,ListaPixelesBlancos2),
-	insertar_pixeles_blancos_profundidad_repetida_bit(ListaPixelesAgrupados,ListaPixelesBlancos2,ListaPixelesSeparados),!.
-
-separar_capas_bit(Lista, Lista2):-
-    pixeles_primera_posicion_bit(Lista,T),
-    pixeles_en_blanco_bit(Lista,R),
-    quitar_primer_pixel(R,R2),
-    insertar_pixeles_blancos_bit(T,R2,Lista2),!.
-
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Descripcion:
 imageDepthLayers(Image, ImageEnCapas):-
-       imageIsPixmap(Image)->  
-    image(Ancho,Alto,ListaPixeles,Image),
-     seleccionar_profundidad_rgb(ListaPixeles,Profundidades),
-    (   length(Profundidades,LargoProfundidades),
-    LargoProfundidades < Ancho * Alto ->  
-    
-    separar_capas_repeticion_profundidades_rgb(ListaPixeles,ListaPixelesSeparados),
-    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
-    separar_capas_rgb(ListaPixeles,ListaPixelesSeparados),
-    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
+        imageIsPixmap(Image)->  
+            image(Ancho,Alto,ListaPixeles,Image),
+            seleccionar_profundidad_rgb(ListaPixeles,Profundidades),
+            (length(Profundidades,LargoProfundidades),
+            LargoProfundidades < Ancho * Alto ->  
+                separar_capas_repeticion_profundidades_rgb(ListaPixeles,ListaPixelesSeparados),
+                insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
+                separar_capas_rgb(ListaPixeles,ListaPixelesSeparados),
+                insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
     
     imageIsBitmap(Image)->  
-    image(Ancho,Alto,ListaPixeles,Image),
-     seleccionar_profundidad_bit(ListaPixeles,Profundidades),
-     (   length(Profundidades,LargoProfundidades),
-    LargoProfundidades< Ancho * Alto ->  
-    separar_capas_repeticion_profundidades_bit(ListaPixeles,ListaPixelesSeparados),
-    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
-    separar_capas_bit(ListaPixeles,ListaPixelesSeparados),
-    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
+        image(Ancho,Alto,ListaPixeles,Image),
+        seleccionar_profundidad_bit(ListaPixeles,Profundidades),
+        (length(Profundidades,LargoProfundidades),
+        LargoProfundidades< Ancho * Alto ->  
+            separar_capas_repeticion_profundidades_bit(ListaPixeles,ListaPixelesSeparados),
+            insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
+            separar_capas_bit(ListaPixeles,ListaPixelesSeparados),
+            insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
     
     imageIsHexmap(Image)->  
-    image(Ancho,Alto,ListaPixeles,Image),
-     seleccionar_profundidad_hex(ListaPixeles,Profundidades),
-     (   length(Profundidades,LargoProfundidades),
-    LargoProfundidades< Ancho * Alto ->  
-    separar_capas_repeticion_profundidades_hex(ListaPixeles,ListaPixelesSeparados),
-    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
-    separar_capas_hex(ListaPixeles,ListaPixelesSeparados),
-    insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)).
+        image(Ancho,Alto,ListaPixeles,Image),
+        seleccionar_profundidad_hex(ListaPixeles,Profundidades),
+        (length(Profundidades,LargoProfundidades),
+        LargoProfundidades< Ancho * Alto ->  
+            separar_capas_repeticion_profundidades_hex(ListaPixeles,ListaPixelesSeparados),
+            insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas);
+            separar_capas_hex(ListaPixeles,ListaPixelesSeparados),
+            insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)).
 
-
+/*-------------------------------------PREDICADO ------------------------------------------------------*/
+% Dominio:
+% Descripcion:
 imageDecompress([Ancho,Alto,Pixeles] , PixelesEliminados , [Ancho,Alto,ImagenDescomprimida]) :- 
-    append(Pixeles,PixelesEliminados,ImagenDescomprimida).
+    append(Pixeles,PixelesEliminados,ImagenDesordenada),
+    ordenar_segun_x(ImagenDesordenada,ImagenDescomprimida).
+

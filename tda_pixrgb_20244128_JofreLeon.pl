@@ -70,7 +70,6 @@ color_frecuente_rgb([[_,_,R,G,B,_]|Cola], R_frecuente, G_frecuente, B_frecuente,
 color_frecuente_rgb([[X, Y, R,G,B, Profundidad]|Cola], R_frecuente, G_frecuente, B_frecuente, [[X, Y, R,G,B, Profundidad]|Resultado]):- 
     color_frecuente_rgb(Cola, R_frecuente, G_frecuente, B_frecuente, Resultado).
 
-
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:
 % Descripcion:
@@ -322,8 +321,7 @@ quitar_primer_pixel([_|Tail], Tail).
 
 imageIsPixmap([_,_, [[_,_,R,G,B,_]|_]]) :-
     R >= 0, G >= 0, B >= 0, R =< 255, G =< 255, B =< 255 -> 
-    writeln('#t');
-    writeln('#f').
+    writeln('#t').
 
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:

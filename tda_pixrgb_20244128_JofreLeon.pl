@@ -32,6 +32,9 @@ PRIMERA PARTE:  PREDICADOS AUXILIARES O PREDICADOS CON FUNCIONES ESPECIFICAS    
     % seleccionar_profundidad_rgb(ListaProfundidad, ListaProfundidadSinDulplicas).
     % pixeles_a_string_rgb(ListaPixeles, Alto, ListaString).
     % eliminar_pixel_rgb(ListaPixeles, X2,Y2, ListaPixelesSinUnPixel).
+    % insertar_pixeles_blancos_rgb(ListaPixeles,PixelesBlancos,ListaPixelesConPixelesBlancos).
+	% insertar_pixeles_blancos_profundidad_repetida_rgb(ListaPixeles,PixelesBlancos,ListaPixelesConPixelesBlancos).
+	% agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesBlancosConNuevaProfundidad).
     % quitar_primer_pixel(ListaPixeles, ColaListaPixeles). 
     % flipV_AuxRGB(Alto,ListaPixeles, ListaPixelesModificada).
     % flipH_AuxRGB(Alto,ListaPixeles, ListaPixelesModificada).
@@ -203,7 +206,7 @@ eliminar_pixel_rgb([[X,Y,R,G,B, Profundidad]|Cola], X2,Y2, [[X, Y, R,G,B, Profun
     % Llamada recursiva.
     eliminar_pixel_rgb(Cola, X2,Y2, Resultado).
 
-/*-------------------------------------PREDICADO AGREGAR-PIXEL-RGB------------------------------------------------------*/
+/*-------------------------------------PREDICADO AGREGAR-PIXEL-RGB---------------------------------------------------------------------*/
 % Dominio: Lista de pixeles.
 % Descripcion: Inserta el pixel ingresado en la lista de pixeles. Utilizado en imageChangePixel.
 
@@ -215,11 +218,49 @@ agregar_pixel_rgb(ListaPixeles, [X,Y,R,G,B, Profundidad], ListaPixelesConUnoNuev
     % Ordena toda la lista de menor a mayor segun el primer elemento.
     ordenar_segun_x(Lista,ListaPixelesConUnoNuevo).
 
+/*-------------------------------------PREDICADO INSERTAR-PIXELES-BLANCOS-RGB--------------------------------------------------------*/
+% Dominio:Lista de pixeles.
+% Descripcion: inserta los pixeles con los colores blancos en los pixeles de la imagen a la que se le quieren obtener las capas. Utilizado en imageDepthLayers.
+
+% Se recorren las listas hasta que no haya ningun elemento en la posicion siguiente. 
+insertar_pixeles_blancos_rgb([],_,[]) .      
+insertar_pixeles_blancos_rgb([[X,Y,R,G,B,Profundidad]|Cola],PixelesBlancos,[[[X,Y,R,G,B,Profundidad]|PixelesBlancosConProfundidad]|ColaResultado]):- 
+    % La profundidad de los pixeles blancos se reemplaza por la del pixel con color.
+    agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesBlancosConProfundidad),
+    % Llamada recursiva.
+    insertar_pixeles_blancos_rgb(Cola,PixelesBlancos,ColaResultado).
+ 
+/*-------------------------------------PREDICADO INSERTAR-PIXELES-BLANCOS-PROFUNDIDAD-REPETIDA-RGB-------------------------------------------------------------------*/
+% Dominio:Lista de pixeles.
+% Descripcion: inserta los pixeles con los colores blancos en los pixeles de la imagen a la que se le quieren obtener las capas, pero que tiene
+% profundidades repeteidas. Utilizado en imageDepthLayers.
+
+% Se recorren las listas hasta que no haya ningun elemento en la posicion siguiente. 
+insertar_pixeles_blancos_profundidad_repetida_rgb([],_,[]) .      
+insertar_pixeles_blancos_profundidad_repetida_rgb([[[X,Y,R,G,B,Profundidad]|ColaGrupo]|Cola] , PixelesBlancos, [ PixelesInsertados |ColaResultado]) :- 
+    % La profundidad de los pixeles blancos se reemplaza por la del pixel con color.
+    agregar_profundidad_rgb(PixelesBlancos,Profundidad,PixelesConProfundidad),
+    % Se insertan en la lista con los otros pixeles
+    append([[X,Y,R,G,B,Profundidad]|ColaGrupo],PixelesConProfundidad,PixelesInsertados),
+    % Llamada recursiva.
+    insertar_pixeles_blancos_profundidad_repetida_rgb(Cola,PixelesBlancos,ColaResultado).
+	
+/*-------------------------------------PREDICADO AGREGAR-PROFUNDIDAD-RGB-----------------------------------------------------------------------------------------*/
+% Dominio:Lista de pixeles Blancos.
+% Descripcion: Cambia la profundidad de los pixeles blancos por la del pixel a la que se le insertaran estos. Utilizado en imageDepthLayers.
+
+% Se recorren las listas hasta que no haya ningun elemento en la posicion siguiente. 
+agregar_profundidad_rgb([],_,[]).      
+% Se realiza el cambio de profundidad.
+agregar_profundidad_rgb([[X, Y, R,G,B,_]|Cola],Profundidad,[[X, Y, R,G,B,Profundidad]|ColaResultado]) :- 
+    % Llamada recursiva.
+    agregar_profundidad_rgb(Cola,Profundidad,ColaResultado).
+ 
 /*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
 % Dominio:Lista de pixeles.
 % Descripcion:Elimina el primer pixel de una lista de pixeles. Utilizado en imageDepthLayers.
  
-quitar_primer_pixel([_|Cola], ColaListaPixeles).    
+quitar_primer_pixel([_|Cola], Cola).    
 % Deja solo la cola de la lista.
 /*-----------------------------------------------------OTROS PREDICADOS------------------------------------------------------*/
 /*-------------------------------------PREDICADO FLIPV_AUXRGB----------------------------------------------------------------*/

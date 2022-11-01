@@ -248,11 +248,7 @@ agregar_tab([],[]) .
 agregar_tab([Cabeza|Cola],[Cabeza,"\t"|ColaResultado]):- 
     agregar_tab(Cola,ColaResultado).
 
-/*-------------------------------------PREDICADO QUITAR-PRIMER-PIXEL------------------------------------------------------*/
-% Dominio:Lista de pixeles.
-% Descripcion:Elimina el primer pixel de una lista de pixeles.
- 
-quitar_primer_pixel([_|Tail], Tail).
+
   
 /*-------------------------------------PREDICADO ------------------------------------------------------*/
 % Dominio:

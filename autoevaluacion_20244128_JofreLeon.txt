@@ -1,0 +1,28 @@
+autoevaluacion: 
+parametros: 
+0: No realizado.
+0.25: Implementación con problemas mayores (funciona 25% de las veces o no funciona)
+0.5: Implementación con funcionamiento irregular (funciona 50% de lasveces)
+0.75: Implementación con problemas menores (funciona 75% de las veces)
+1: Implementación completa sin problemas (funciona 100% de las veces)
+
+
+
+Image: 1
+imageIsBitmap: 1 
+imageIsHexmap: 1
+imageIsPixmap: 1
+imageIsCompressed: 1 
+imageFlipH: 1
+imageFlipV: 1
+imageCrop:  0.75
+imageRGBToHex: 1
+imageToHistogram: 1
+imageRotate90: 1
+imageCompress: 1
+imageChangePixel: 1
+imageInvertColorRGB: 1
+imageToString: 1
+imageDepthLayers: 0.75
+imageDecompress: 1
+

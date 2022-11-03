@@ -1,6 +1,6 @@
 % Predicado para exportar los predicados al script de pruebas.
 :- module(tda_image_20244128_JofreLeon,[image/4, imageFlipH/2, imageFlipV/2, imageCrop/6,imageRGBToHex/2,imageToHistogram/2, imageRotate90/2,imageCompress/3,imageChangePixel/3,imageToString/2,
-                                        imageDepthLayers/2,imageDecompress/3 ]).
+                                        imageDepthLayers/2,imageDecompress/3,imageIsCompressed/1 ]).
 % Predicados para importar los predicados de los otros archivos.
 :- use_module(tda_pixbit_20244128_JofreLeon).
 :- use_module(tda_pixhex_20244128_JofreLeon).
@@ -280,7 +280,7 @@ cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados ):-
 % Descripcion: Ordena los pixeles de menor a mayor utilizando la posicion y. Utilizado en imageChangePixel.
 
 ordenar_segun_y(Lista_pixeles, Pixeles_ordenados):-
-    % Ordena de menor a mayor sin eliminar duplicados.
+    % Ordena de mayor a menor sin eliminar duplicados.
     sort(2, @=<, Lista_pixeles, Pixeles_ordenados).
 
 /*-------------------------------------PREDICADO ORDENAR-SEGUN-X ------------------------------------------------------*/
@@ -396,8 +396,8 @@ imageIsCompressed(Image):-
     largo_lista(ListaPixeles, Largo),
     % una imagen comprimida tendra menos pixeles que lo que indica el ancho*alto.
     Total == Largo ->  
-        writeln('#f');
-        writeln('#t').
+        writeln('#f, NO COMPRIMIDA');
+        writeln('#t, COMPRIMIDA').
 
 /*-------------------------------------PREDICADO FLIPH------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
@@ -411,7 +411,7 @@ imageFlipH(Image, ImagenInvertida):-
         % Realiza la inversion.
         flipH_Aux(Ancho,ListaPixeles, PixelesInvertidos), 
         % Retorna la imagen con los pixeles invertidos
-        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida);
+        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida),!;
     % Ve el tipo de imagen corresponde a bitmap
     imageIsBitmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -419,7 +419,7 @@ imageFlipH(Image, ImagenInvertida):-
         % Realiza la inversion.
         flipH_Aux(Ancho,ListaPixeles, PixelesInvertidos), 
         % Retorna la imagen con los pixeles invertidos
-        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida);
+        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida),!;
     % Ve el tipo de imagen corresponde a pixmap    
     imageIsPixmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -427,7 +427,7 @@ imageFlipH(Image, ImagenInvertida):-
         % Realiza la inversion.
         flipH_AuxRGB(Ancho,ListaPixeles, PixelesInvertidos), 
         % Retorna la imagen con los pixeles invertidos
-        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida).
+        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida),!.
 
 /*------------------------------------- PREDICADO FLIPV------------------------------------------------------*/
 % Dominio: Imagen (lista con el ancho, alto y los pixeles)
@@ -441,7 +441,7 @@ imageFlipV(Image, ImagenInvertida):-
         % Realiza la inversion.
         flipV_Aux(Ancho,ListaPixeles, PixelesInvertidos), 
         % Retorna la imagen con los pixeles invertidos
-        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida);
+        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida),!;
     % Ve el tipo de imagen corresponde a bitmap    
     imageIsBitmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -449,7 +449,7 @@ imageFlipV(Image, ImagenInvertida):-
         % Realiza la inversion.
         flipV_Aux(Ancho,ListaPixeles, PixelesInvertidos), 
         % Retorna la imagen con los pixeles invertidos
-        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida);
+        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida),!;
     % Ve el tipo de imagen corresponde a pixmap    
     imageIsPixmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -457,7 +457,7 @@ imageFlipV(Image, ImagenInvertida):-
         % Realiza la inversion.
         flipV_AuxRGB(Ancho,ListaPixeles, PixelesInvertidos), 
         % Retorna la imagen con los pixeles invertidos
-        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida).
+        image(Ancho, Alto, PixelesInvertidos, ImagenInvertida),!.
 
 /*-------------------------------------PREDICADO IMAGE-CROP------------------------------------------------------*/
 % Dominio: image
@@ -469,7 +469,7 @@ imageCrop(Image,X1,Y1, X2,Y2, ImageCortada):-
     % Con cropAux realiza la seleccion de pixeles.
     cropAux(ListaPixeles, X1,Y1, X2,Y2,Alto, PixelesSeleccionados),
     % Retorna la imagen cortada
-    image(Ancho,Alto, PixelesSeleccionados, ImageCortada).
+    image(Ancho,Alto, PixelesSeleccionados, ImageCortada),!.
 
 /*-------------------------------------PREDICADO IMAGE-RGB-TO-HEX------------------------------------------------------*/
 % Dominio: Image
@@ -481,7 +481,7 @@ imageRGBToHex(ImageRGB, ImageHEX):-
     % Realiza la transformacion de rgb a hex en la lista de pixeles.
   	rgb_hex(ListaPixeles, PixelesAHex),
     % Retorna la imagen de tipo hexmap.
-    image(Ancho,Alto, PixelesAHex, ImageHEX).
+    image(Ancho,Alto, PixelesAHex, ImageHEX),!.
 
 /*-------------------------------------PREDICADO IMAGE-TO-HISTOGRAM------------------------------------------------------*/
 % Dominio: Image
@@ -497,7 +497,9 @@ imageToHistogram(Image, Histograma):-
         % Ordena la lista.
         ordenar_lista(PixelesHex,PixelesHexOrdenados),
         % Cuenta los colores y retorna el histograma
-        contar_color(PixelesHexOrdenados, Histograma);
+        contar_color(PixelesHexOrdenados, Histograma1),
+        sort(2,@>=,Histograma1,Histograma),!;
+
     % Ve el tipo de imagen corresponde a pixmap  
     imageIsPixmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -507,7 +509,8 @@ imageToHistogram(Image, Histograma):-
         % Ordena la lista.
         ordenar_lista(PixelesRGB,PixelesRGBOrdenados),
         % Cuenta los colores y retorna el histograma
-        contar_color(PixelesRGBOrdenados, Histograma);
+        contar_color(PixelesRGBOrdenados, Histograma1),
+        sort(2,@>=,Histograma1,Histograma),!;
     % Ve el tipo de imagen corresponde a bitmap  
     imageIsBitmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -517,7 +520,8 @@ imageToHistogram(Image, Histograma):-
         % Ordena la lista.
         ordenar_lista(PixelesBit,PixelesBitOrdenados),
         % Cuenta los colores y retorna el histograma
-        contar_color(PixelesBitOrdenados, Histograma).
+        contar_color(PixelesBitOrdenados, Histograma1),
+        sort(2,@>=,Histograma1,Histograma),!.
 
 /*-------------------------------------PREDICADO IMAGE-ROTATE-90------------------------------------------------------*/
 % Dominio: image
@@ -533,7 +537,7 @@ imageRotate90(Image, ImagenRotada):-
         % Ordena la lista de pixeles.
     	ordenar_segun_x(PixelesRotados,PixelesOrdenado),
         % Retorna la imagen rotada.
-    	image(Ancho, Alto, PixelesOrdenado, ImagenRotada);
+    	image(Ancho, Alto, PixelesOrdenado, ImagenRotada),!;
     % sino se llama al predicado rotate_Aux
     % Recibe la imagen y sus elementos.
     image(Ancho,Alto, ListaPixeles, Image), 
@@ -542,7 +546,7 @@ imageRotate90(Image, ImagenRotada):-
     % Ordena la lista de pixeles.
    	ordenar_segun_x(PixelesRotados,PixelesOrdenado),
     % Retorna la imagen rotada.
-    image(Ancho, Alto, PixelesOrdenado, ImagenRotada).
+    image(Ancho, Alto, PixelesOrdenado, ImagenRotada),!.
 
 /*-------------------------------------PREDICADO IMAGE-COMPRESS------------------------------------------------------*/
 % Dominio: Image
@@ -560,7 +564,7 @@ imageCompress(Image, ImageComprimida,Z):-
         % realiza la separacion entre los pixeles que mas se repiten y los que no
     	colores_rgb(ListaPixeles,R,G,B, Z,PixelesComprimidos),
         % Retorna la imagen comprimida
-    	image(Alto,Ancho, PixelesComprimidos, ImageComprimida);
+    	image(Alto,Ancho, PixelesComprimidos, ImageComprimida),!;
     % Sino se realiza la compresion normalmente.
     image(Alto,Ancho, ListaPixeles, Image),
     % Calcula el histograma.
@@ -570,28 +574,32 @@ imageCompress(Image, ImageComprimida,Z):-
     % realiza la separacion entre los pixeles que mas se repiten y los que no
     colores(ListaPixeles,Color,Z,PixelesComprimidos),
     % Retorna la imagen comprimida
-    image(Alto,Ancho, PixelesComprimidos, ImageComprimida).
+    image(Alto,Ancho, PixelesComprimidos, ImageComprimida),!.
 
 /*-------------------------------------PREDICADO IMAGE-CHANGE-PIXEL------------------------------------------------------*/
 % Dominio: Image
 % Descripcion: Cambia un pixel a eleccion.
 
 imageChangePixel(Image, Pixel, ImagenModificada):-
-    % Ve si el pixel ingresado es de tipo pixrgb
-    largo_lista(Pixel, Largo),
-    Largo==6 ->  
+    imageIsHexmap(Image)->  
+        image(Alto,Ancho, ListaPixeles, Image),
+        % Realiza el cambio de un pixel con otro
+        agregar_pixel(ListaPixeles, Pixel, ListaNueva),
+        % Retorna la imagen modificada
+        image(Alto,Ancho, ListaNueva, ImagenModificada),!;
+    imageIsBitmap(Image)-> 
+        image(Alto,Ancho, ListaPixeles, Image),
+        % Realiza el cambio de un pixel con otro
+        agregar_pixel(ListaPixeles, Pixel, ListaNueva),
+        % Retorna la imagen modificada
+        image(Alto,Ancho, ListaNueva, ImagenModificada),!;
+    imageIsPixmap(Image)-> 
         % Recibe la imagen y sus elementos.
 		image(Alto,Ancho, ListaPixeles, Image),
         % Realiza el cambio de un pixel con otro
 		agregar_pixel_rgb(ListaPixeles, Pixel, ListaNueva),
         % Retorna la imagen modificada
-		image(Alto,Ancho, ListaNueva, ImagenModificada);
-    % Sino realiza el cambio normalmente
-    image(Alto,Ancho, ListaPixeles, Image),
-    % Realiza el cambio de un pixel con otro
-    agregar_pixel(ListaPixeles, Pixel, ListaNueva),
-    % Retorna la imagen modificada
-    image(Alto,Ancho, ListaNueva, ImagenModificada).
+		image(Alto,Ancho, ListaNueva, ImagenModificada),!.
 
 /*-------------------------------------PREDICADO IMAGE-TO-STRING------------------------------------------------------*/
 % Dominio: Image
@@ -603,19 +611,19 @@ imageToString(Image, ImageEnString):-
         % Recibe la imagen y sus elementos.
     	image(_,Alto,ListaPixeles,Image),
         % Realiza la transformacion a string
-    	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString);
+    	pixeles_a_string_hex(ListaPixeles, Alto, ImageEnString),!;
     % ve si la imagen es de tipo pixmap
     imageIsPixmap(Image)->  
         % Recibe la imagen y sus elementos.
     	image(_,Alto,ListaPixeles,Image),
         % Realiza la transformacion a string
-    	pixeles_a_string_rgb(ListaPixeles, Alto, ImageEnString);
+    	pixeles_a_string_rgb(ListaPixeles, Alto, ImageEnString),!;
     % ve si la imagen es de tipo pixmap
     imageIsBitmap(Image)->  
         % Recibe la imagen y sus elementos.
     	image(_,Alto,ListaPixeles,Image),
         % Realiza la transformacion a string
-    	pixeles_a_string_bit(ListaPixeles, Alto, ImageEnString).
+    	pixeles_a_string_bit(ListaPixeles, Alto, ImageEnString),!.
 
 /*-------------------------------------PREDICADO IMAGE-DEPTH-LAYERS------------------------------------------------------*/
 % Dominio: Image
@@ -640,7 +648,7 @@ imageDepthLayers(Image, ImageEnCapas):-
         % se separan las capas agregando los pixeles blancos.
         separar_capas_rgb(ListaPixeles,ListaPixelesSeparados),
         % Se inserta el ancho y el alto a las capas generadas y se retornan las nuevas imagenes
-        insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
+        insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)),!;
     % ve si la imagen es de tipo pixmap
     imageIsBitmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -657,7 +665,7 @@ imageDepthLayers(Image, ImageEnCapas):-
         % se separan las capas agregando los pixeles blancos.
         separar_capas_bit(ListaPixeles,ListaPixelesSeparados),
         % Se inserta el ancho y el alto a las capas generadas y se retornan las nuevas imagenes
-        insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas));
+        insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)),!;
     % ve si la imagen es de tipo pixmap
     imageIsHexmap(Image)->  
         % Recibe la imagen y sus elementos.
@@ -674,7 +682,7 @@ imageDepthLayers(Image, ImageEnCapas):-
         % se separan las capas agregando los pixeles blancos.
         separar_capas_hex(ListaPixeles,ListaPixelesSeparados),
         % Se inserta el ancho y el alto a las capas generadas y se retornan las nuevas imagenes
-        insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)).
+        insertarAnchoAlto(Ancho,Alto,ListaPixelesSeparados, ImageEnCapas)),!.
 
 /*-------------------------------------PREDICADO IMAGE-DECOMPRESS------------------------------------------------------*/
 % Dominio: Image
@@ -684,5 +692,5 @@ imageDecompress([Ancho,Alto,Pixeles] , PixelesEliminados , [Ancho,Alto,ImagenDes
     % A la imagen comprimida se le agregan los pixeles que fueron eliminados.
     append(Pixeles,PixelesEliminados,ImagenDesordenada),
     % se ordenan los pixeles para que se tenga el mimso orden que la imagen original
-    ordenar_segun_y(ImagenDesordenada,ImagenDesordenada1),
-    ordenar_segun_x(ImagenDesordenada1,ImagenDescomprimida).
+    sort(2,@=<,ImagenDesordenada,ImagenDesordenada1),
+    ordenar_segun_x(ImagenDesordenada1,ImagenDescomprimida),!.

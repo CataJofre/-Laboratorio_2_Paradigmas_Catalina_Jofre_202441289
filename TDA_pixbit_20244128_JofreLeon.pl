@@ -124,7 +124,7 @@ pixeles_a_string_bit(ListaPixeles, Alto, ListaString):-
     % Analiza si es par o impar.
     impar(Alto) ->  
         % Obtiene los colores.
-    	seleccionar_rgb(ListaPixeles, Pixeles),
+    	seleccionar_bit(ListaPixeles, Pixeles),
         % Inserta la tabulacion.
     	agregar_tab(Pixeles, PixTab),
         % Inserta salto de linea.
@@ -134,11 +134,11 @@ pixeles_a_string_bit(ListaPixeles, Alto, ListaString):-
         % Convierte a string.
     	atomics_to_string(PixLista, ListaString);
     % Obtiene los colores.
-    seleccionar_rgb(ListaPixeles, Pixeles),
+    seleccionar_bit(ListaPixeles, Pixeles),
     % Inserta la tabulacion.
     agregar_tab(Pixeles, PixTab),
     % Inserta salto de linea.
-    agregar_salto(PixTab, Alto, PixSalto),
+    agregar_salto(PixTab, (Alto+2), PixSalto),
     % Quita sublistas.
     flatten(PixSalto, PixLista),
     % Convierte a string.

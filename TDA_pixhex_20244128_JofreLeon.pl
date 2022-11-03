@@ -172,7 +172,7 @@ pixeles_a_string_hex(ListaPixeles, Alto, ListaString):-
     % Inserta la tabulacion.
     agregar_tab(Pixeles, PixTab),
     % Inserta salto de linea.
-    agregar_salto(PixTab, Alto, PixSalto),
+    agregar_salto(PixTab, (Alto+2), PixSalto),
     % Quita sublistas.
     flatten(PixSalto, PixLista),
     % Convierte a string.
